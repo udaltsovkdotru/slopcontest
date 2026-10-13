@@ -2,7 +2,7 @@
 
 ПРОООДОВЦЫ, посмотрим, какая ЛЛМка слопит лучше всех. Слоп на любой вкус и цвет!
 
-Нейросети переделывают лендинг олимпиады PROD ([prodcontest.com](https://prodcontest.com)) — каждая дважды: голым промптом и с дизайн-скиллами. Результат публикуется как есть.
+Нейросети разных компаний (Google Gemini, Anthropic Claude, Xiaomi MiMo и дальше больше) переделывают лендинг олимпиады PROD ([prodcontest.com](https://prodcontest.com)) — каждая дважды: голым промптом и с дизайн-скиллами. Результат публикуется как есть.
 
 ## Структура
 
@@ -11,7 +11,8 @@ site/              главная (шаблон: {{MENU}} и счётчики п
 slops/models.json  модели и варианты
 slops/<model>/<variant>/index.html   слоп модели
 prompts/           промпты и файлы скиллов для вложения → prompts/README.md
-scripts/build.ts   сборка в dist/
+scripts/build.ts   сборка в dist/ (Bun.build, Bun.Glob, Bun.$)
+scripts/shots.ts   превью слопов (Bun.WebView + Bun.Image → webp)
 ```
 
 ## Команды
@@ -20,7 +21,8 @@ scripts/build.ts   сборка в dist/
 
 ```sh
 bun run build           # dist/
-bun run dev             # сборка + http://localhost:3000
+bun run dev             # сборка + http://localhost:3000, пересборка при изменениях
+bun run shots           # превью новых слопов (нужен Chromium: BUN_CHROME_PATH)
 bun run skills:install  # дизайн-скиллы локально в .claude/skills (не коммитятся)
 ```
 

@@ -180,6 +180,9 @@ img { display: block; max-width: 100%; height: auto; }
   margin-bottom: clamp(40px, 5vw, 72px);
 }
 .chapter-head p { max-width: 42ch; }
+.chapter-head h2 { max-width: none; }
+
+.vitrine { background: var(--vit-bg); color: var(--vit-ink); }
 
 /* Витрина: порции слопа. Превью в арке, как «О» на первом экране; при наведении прокручивается вниз */
 .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
@@ -203,7 +206,7 @@ a.tile-link:active { transform: scale(0.985); }
 a.tile-link:hover .tile-window img, a.tile-link:focus-visible .tile-window img { transform: translateY(-50%); }
 .tile-wait {
   position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
-  background: color-mix(in srgb, var(--field-ink) 14%, var(--field));
+  background: color-mix(in srgb, var(--field-ink) 6%, var(--field));
   color: var(--field-ink);
   font: 600 var(--step-small)/1.2 var(--display);
 }
@@ -386,6 +389,7 @@ html:not(.js) .compare-frame figcaption { grid-column: 1 / -1; }
 
 /* Планшет */
 @media (max-width: 1000px) {
+  .chapter-head { grid-template-columns: minmax(0, 1fr); }
   .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .board { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .b-say, .b-nav, .b-time, .b-mail { grid-column: span 3; }

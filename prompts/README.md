@@ -25,7 +25,7 @@
 
 Брались только тексты: скрипты (`draw.mjs`, `inspect.mjs`, `impeccable context`) в чате не запустить, промпт прямо говорит модели пропускать такие шаги. Порядок файлов в бандле — `SKILL_FILES` в `scripts/build.ts`.
 
-## Как прогонять (чат Gemini)
+## Как прогонять в чате
 
 1. Новый чат на каждую попытку. Без Gems, без сохранённых инструкций и истории.
 2. Выбрать модель. Поиск не выключать — модели разрешено сходить на prodcontest.com.
@@ -40,5 +40,11 @@
 | Gemini Flash 3.8 | `slops/gemini-3.8-flash/` |
 | Gemini Pro 3.1 | `slops/gemini-3.1-pro/` |
 | Gemini Argon 4 | `slops/gemini-argon-4/` |
+| Claude Haiku 5.5 | `slops/claude-haiku-5.5/` |
+| Claude Sonnet 5.5 | `slops/claude-sonnet-5.5/` |
+| Claude Opus 5.5 | `slops/claude-opus-5.5/` (только со скиллами) |
+| MiMo V2.6 Pro | `slops/mimo-v2.6-pro/` |
 
-Хорошо бы рядом класть `notes.md`: дата, сколько раз писали «продолжай», ходила ли модель в поиск.
+После того как положил HTML — `bun run shots`, чтобы снять превью для витрины.
+
+Рядом кладём `notes.md`: дата, сколько раз писали «продолжай», ходила ли модель в поиск.
