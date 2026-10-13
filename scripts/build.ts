@@ -1,7 +1,7 @@
-// Собирает dist/ для GitHub Pages: главная, слопы моделей, промпты и бандл скиллов.
-import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { join, relative } from "node:path";
+// Собирает dist/ для GitHub Pages только средствами Bun:
+// Bun.build бандлит site/index.html (CSS, JS, картинки с хэшами), Bun.Glob/Bun.write копируют слопы и промпты.
+import { join } from "node:path";
+import registry from "../slops/models.json";
 
 const MIN_BUN = ">=1.4.0";
 if (!Bun.semver.satisfies(Bun.version, MIN_BUN)) {
@@ -12,13 +12,14 @@ if (!Bun.semver.satisfies(Bun.version, MIN_BUN)) {
 const root = join(import.meta.dir, "..");
 const dist = join(root, "dist");
 const read = (p: string) => Bun.file(join(root, p)).text();
+const exists = (p: string) => Bun.file(join(root, p)).size > 0;
+const esc = Bun.escapeHTML;
+const repo = process.env.GITHUB_REPOSITORY ?? "udaltsovkdotru/slopcontest";
 
-type Variant = { id: string; label: string; prompt: string };
-type Model = { id: string; name: string; vendor: string; flavor: string; color: string; ink: string };
-const registry: { variants: Variant[]; models: Model[] } = JSON.parse(await read("slops/models.json"));
-
-const esc = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+type Variant = (typeof registry.variants)[number];
+type Model = (typeof registry.models)[number] & { variants?: string[]; note?: string };
+const models = registry.models as Model[];
+const variantsOf = (m: Model) => registry.variants.filter((v) => !m.variants || m.variants.includes(v.id));
 
 // --- Промпты: бриф обязан быть одинаковым во всех вариантах, иначе сравнение нечестное.
 const BRIEF = /<!-- BRIEF:START -->([\s\S]*?)<!-- BRIEF:END -->/;
@@ -52,8 +53,7 @@ const SKILL_FILES = [
   "motion-design/patterns/ambient-continuous.md",
 ];
 const skillsDir = join(root, "prompts/skills");
-const onDisk = (await readdir(skillsDir, { recursive: true })).filter((f) => f.endsWith(".md")).map((f) => f.replaceAll("\\", "/"));
-const unused = onDisk.filter((f) => !SKILL_FILES.includes(f));
+const unused = [...new Bun.Glob("**/*.md").scanSync(skillsDir)].filter((f) => !SKILL_FILES.includes(f));
 if (unused.length) throw new Error(`В prompts/skills лежат файлы вне бандла: ${unused.join(", ")}`);
 
 let bundle =
@@ -63,53 +63,78 @@ let bundle =
   "Ссылки на скрипты и файлы внутри скиллов относятся к их исходным репозиториям; в чате они недоступны.\n";
 for (const f of SKILL_FILES) bundle += `\n\n<!-- ===== FILE: ${f} ===== -->\n\n` + (await Bun.file(join(skillsDir, f)).text()).trim() + "\n";
 
-// --- Меню слопа на главной.
-const slopPath = (m: Model, v: Variant) => `slops/${m.id}/${v.id}/index.html`;
+// --- Витрина: по плитке на каждую пару «модель × вариант».
+const dir = (m: Model, v: Variant) => `slops/${m.id}/${v.id}`;
+const kb = (p: string) => Math.max(1, Math.round(Bun.file(join(root, p)).size / 1024));
 let ready = 0;
-const menu = registry.models
-  .map((m) => {
-    const links = registry.variants
-      .map((v) => {
-        if (existsSync(join(root, slopPath(m, v)))) {
-          ready++;
-          return `<a class="pick" href="slops/${m.id}/${v.id}/">${esc(v.label)}</a>`;
-        }
-        return `<span class="pick is-cooking" aria-disabled="true">${esc(v.label)}<small>ещё варится</small></span>`;
-      })
-      .join("\n          ");
-    return `
-      <li class="flavor" style="--field:${m.color};--field-ink:${m.ink}">
-        <div class="flavor-name">
-          <h3>${esc(m.name)}</h3>
-          <p>Вкус «${esc(m.flavor)}»</p>
+let total = 0;
+const tiles = models.flatMap((m) =>
+  variantsOf(m).map((v) => {
+    total++;
+    const d = dir(m, v);
+    const has = exists(`${d}/index.html`);
+    if (has) ready++;
+    const picture = has && exists(`${d}/preview.webp`)
+      ? `<img src="${d}/preview.webp" width="640" height="1600" loading="lazy" alt="Превью: ${esc(m.name)}, ${esc(v.label.toLowerCase())}">`
+      : `<span class="tile-wait">ещё варится</span>`;
+    const body = `
+            <span class="tile-body">
+              <span class="tile-name">${esc(m.name)}</span>
+              <span class="tile-meta"><span>${esc(m.vendor)}</span><span>вкус «${esc(m.flavor)}»</span></span>
+              <span class="tile-foot"><span class="tile-variant">${esc(v.label)}</span><span class="tile-size">${has ? `${kb(`${d}/index.html`)} КБ` : "в очереди"}</span></span>
+            </span>`;
+    const style = `--field:${m.color};--field-ink:${m.ink}`;
+    const inner = `<span class="tile-window">${picture}</span>${body}`;
+    return has
+      ? `<li class="tile" style="${style}"><a href="${d}/" class="tile-link">${inner}</a></li>`
+      : `<li class="tile is-cooking" style="${style}"><span class="tile-link">${inner}</span></li>`;
+  }),
+);
+
+// --- Сравнение: модели, у которых готовы оба варианта и снято превью.
+const pairs = models
+  .filter((m) => variantsOf(m).length === registry.variants.length)
+  .filter((m) => registry.variants.every((v) => exists(`${dir(m, v)}/preview.webp`)))
+  .map((m) => ({ id: m.id, name: m.name, color: m.color, ink: m.ink, raw: `${dir(m, registry.variants[0])}/`, skills: `${dir(m, registry.variants[1])}/` }));
+const compare = pairs.length
+  ? `<div class="compare" data-compare>
+        <div class="compare-pick" role="group" aria-label="Модель">
+          ${pairs.map((p, i) => `<button type="button" class="chip" data-pair="${p.id}" aria-pressed="${i === 0}" style="--field:${p.color};--field-ink:${p.ink}">${esc(p.name)}</button>`).join("\n          ")}
         </div>
-        <div class="flavor-picks">
-          ${links}
-        </div>
-      </li>`;
-  })
-  .join("");
-const total = registry.models.length * registry.variants.length;
+        <figure class="compare-frame">
+          <img class="compare-raw" src="${pairs[0].raw}preview.webp" width="640" height="800" alt="Без скиллов: ${esc(pairs[0].name)}">
+          <img class="compare-skills" src="${pairs[0].skills}preview.webp" width="640" height="800" alt="Со скиллами: ${esc(pairs[0].name)}">
+          <figcaption><span>Без скиллов</span><span>Со скиллами</span></figcaption>
+        </figure>
+        <label class="compare-range"><span class="sr-only">Граница между вариантами</span><input type="range" min="0" max="100" value="50"></label>
+        <script type="application/json" id="pairs">${JSON.stringify(pairs)}</script>
+      </div>`
+  : `<p class="compare-empty">Как только у какой-нибудь модели сварятся оба варианта, здесь можно будет двигать границу между ними.</p>`;
+
+const vendors = [...new Set(models.map((m) => m.vendor))];
 
 // --- Сборка.
-await rm(dist, { recursive: true, force: true });
-await mkdir(join(dist, "prompts"), { recursive: true });
-
-await cp(join(root, "site"), dist, { recursive: true });
-const html = (await read("site/index.html"))
-  .replace("{{MENU}}", menu)
-  .replace("{{READY}}", String(ready))
-  .replace("{{TOTAL}}", String(total))
-  .replace("{{MODELS}}", String(registry.models.length));
-await writeFile(join(dist, "index.html"), html);
-
-if (existsSync(join(root, "slops"))) {
-  await cp(join(root, "slops"), join(dist, "slops"), {
-    recursive: true,
-    filter: (src) => relative(join(root, "slops"), src) !== "models.json",
-  });
+await Bun.$`rm -rf ${dist}`;
+const built = await Bun.build({ entrypoints: [join(root, "site/index.html")], outdir: dist, minify: true });
+if (!built.success) {
+  for (const log of built.logs) console.error(log);
+  process.exit(1);
 }
-for (const [i, v] of registry.variants.entries()) await writeFile(join(dist, "prompts", `${v.id}.txt`), clean(prompts[i]));
-await writeFile(join(dist, "prompts", "slop-skills.md"), bundle);
+const page = Bun.file(join(dist, "index.html"));
+await Bun.write(
+  page,
+  (await page.text())
+    .replace("{{TILES}}", tiles.join("\n        "))
+    .replace("{{COMPARE}}", compare)
+    .replaceAll("{{READY}}", String(ready))
+    .replaceAll("{{TOTAL}}", String(total))
+    .replaceAll("{{MODELS}}", String(models.length))
+    .replaceAll("{{VENDORS}}", esc(vendors.join(", ")))
+    .replaceAll("{{REPO}}", `https://github.com/${repo}`),
+);
 
-console.log(`Bun ${Bun.version} · готово слопов: ${ready}/${total} · бандл скиллов: ${(bundle.length / 1024).toFixed(0)} КБ → dist/`);
+for (const f of new Bun.Glob("slops/*/*/*").scanSync(root)) await Bun.write(join(dist, f), Bun.file(join(root, f)));
+for (const [i, v] of registry.variants.entries()) await Bun.write(join(dist, "prompts", `${v.id}.txt`), clean(prompts[i]));
+await Bun.write(join(dist, "prompts", "slop-skills.md"), bundle);
+
+console.log(`Bun ${Bun.version} · слопов: ${ready}/${total} · пар для сравнения: ${pairs.length} · бандл скиллов: ${(bundle.length / 1024).toFixed(0)} КБ → dist/`);

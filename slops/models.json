@@ -43,6 +43,44 @@
       "flavor": "Аргон",
       "color": "#8FD3FF",
       "ink": "#06202E"
+    },
+    {
+      "id": "claude-haiku-5.5",
+      "name": "Claude Haiku 5.5",
+      "vendor": "Anthropic",
+      "flavor": "Клубника",
+      "color": "#FF7A9C",
+      "ink": "#2A0010",
+      "note": "Агент в чате, без браузера и скриншотов"
+    },
+    {
+      "id": "claude-sonnet-5.5",
+      "name": "Claude Sonnet 5.5",
+      "vendor": "Anthropic",
+      "flavor": "Мята",
+      "color": "#5EE3B5",
+      "ink": "#00271A",
+      "note": "Агент в чате, без браузера и скриншотов"
+    },
+    {
+      "id": "claude-opus-5.5",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "flavor": "Шоколад",
+      "color": "#5A3220",
+      "ink": "#FFE9CC",
+      "variants": [
+        "skills"
+      ],
+      "note": "Агент со скиллами и проверкой в браузере"
+    },
+    {
+      "id": "mimo-v2.6-pro",
+      "name": "MiMo V2.6 Pro",
+      "vendor": "Xiaomi",
+      "flavor": "Матча",
+      "color": "#6B8E3A",
+      "ink": "#F7FFE8"
     }
   ]
 }
