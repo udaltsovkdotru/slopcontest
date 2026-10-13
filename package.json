@@ -1,0 +1,15 @@
+{
+  "name": "slopcontest",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.4.3",
+  "engines": {
+    "bun": ">=1.4.0"
+  },
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "dev": "bun scripts/build.ts && bun scripts/serve.ts",
+    "shots": "bun scripts/shots.ts",
+    "skills:install": "bun scripts/install-skills.ts"
+  }
+}

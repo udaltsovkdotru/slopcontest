@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>slopcontest</title>
+  <meta name="description" content="ПРОООДОВЦЫ, посмотрим, какая ЛЛМка слопит лучше всех. Нейросети переделывают лендинг олимпиады PROD — слоп на любой вкус и цвет.">
+  <meta name="theme-color" content="#00402E">
+  <meta property="og:title" content="slopcontest — слоп на любой вкус и цвет">
+  <meta property="og:description" content="Нейросети разных компаний переделывают лендинг олимпиады PROD. Смотрим, какая слопит лучше всех.">
+  <meta property="og:image" content="./original.webp">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700&family=Unbounded:wght@600;800;900&display=swap">
+  <link rel="stylesheet" href="./style.css">
+  <script>
+    document.documentElement.classList.add('js');
+    try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#vitrine">К витрине</a>
+
+  <header class="bar">
+    <a class="wordmark" href="./">slopcontest</a>
+    <nav aria-label="Разделы">
+      <a href="#vitrine">Витрина</a>
+      <a href="#compare" class="hide-s">Сравнить</a>
+      <a href="#recipe" class="hide-s">Рецепт</a>
+      <a href="#chats">Чаты</a>
+      <button type="button" class="theme" data-theme-toggle aria-label="Переключить тему">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 3a9 9 0 0 0 0 18z" /></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <svg class="scoops" viewBox="0 0 1000 1000" aria-hidden="true" focusable="false">
+        <rect class="sc sc1" x="40"  y="120" width="420" height="760" rx="210" />
+        <rect class="sc sc2" x="230" y="120" width="420" height="760" rx="210" />
+        <rect class="sc sc3" x="420" y="120" width="420" height="760" rx="210" />
+        <rect class="sc sc4" x="610" y="120" width="420" height="760" rx="210" />
+      </svg>
+      <div class="hero-copy">
+        <h1 id="hero-title" class="shout" aria-label="ПРОООДОВЦЫ,"><span aria-hidden="true">ПР<span class="o o1">О</span><span class="o o2">О</span><span class="o o3">О</span><span class="cut">-</span>Д<span class="o o4">О</span>ВЦЫ,</span></h1>
+        <p class="statement">посмотрим, какая ЛЛМка слопит лучше всех.</p>
+        <p class="tagline">Слоп на любой вкус и цвет!</p>
+        <p class="lede">Нейросети разных компаний ({{VENDORS}}, и дальше больше) переделывают лендинг олимпиады PROD: голым промптом и с дизайн-скиллами. Сварено {{READY}} из {{TOTAL}}.</p>
+        <a class="btn" href="#vitrine">Смотреть витрину</a>
+      </div>
+    </section>
+
+    <section id="vitrine" class="chapter vitrine" aria-labelledby="vitrine-title">
+      <div class="chapter-head reveal">
+        <h2 id="vitrine-title">Витрина слопа</h2>
+        <p>Один промпт, один чат, один HTML-файл. Публикуем ровно то, что выдала модель, без правок руками. Нажми на порцию, чтобы открыть сайт целиком.</p>
+      </div>
+      <ul class="tiles">
+        <li class="tile tile-original" style="--field:#00402E;--field-ink:#F4F8F6">
+          <a href="https://prodcontest.com" class="tile-link">
+            <span class="tile-window"><img src="./original.webp" width="640" height="1600" loading="lazy" alt="Превью оригинального сайта prodcontest.com"></span>
+            <span class="tile-body">
+              <span class="tile-name">Оригинал</span>
+              <span class="tile-meta"><span>prodcontest.com</span><span>эталон</span></span>
+              <span class="tile-foot"><span class="tile-variant">Сделано людьми</span><span class="tile-size">Тильда</span></span>
+            </span>
+          </a>
+        </li>
+        {{TILES}}
+      </ul>
+    </section>
+
+    <section id="compare" class="chapter compare-chapter" aria-labelledby="compare-title">
+      <div class="chapter-head reveal">
+        <h2 id="compare-title">Со скиллами и без</h2>
+        <p>Двигай границу: слева то, что модель сделала сама, справа результат с приложенными frontend-design, impeccable, taste-skill и motion-design.</p>
+      </div>
+      {{COMPARE}}
+    </section>
+
+    <section id="recipe" class="chapter recipe" aria-labelledby="recipe-title">
+      <h2 id="recipe-title" class="reveal">Как варим слоп</h2>
+      <ol class="stages" data-ui>
+        <li style="--grow:1.8"><b>Секунды</b><span>Вставляем промпт в новый чат, для варианта со скиллами прикладываем файл.</span></li>
+        <li style="--grow:4.6"><b>Пара минут</b><span>Модель ищет, что нужно, и пишет один HTML-файл.</span></li>
+        <li style="--grow:2"><b>Иногда</b><span>Пишем «продолжай», если ответ оборвался, и склеиваем куски.</span></li>
+        <li style="--grow:1.8"><b>Сразу</b><span>Публикуем как есть и снимаем превью для витрины.</span></li>
+      </ol>
+      <ul class="kit">
+        <li class="reveal">
+          <span class="kit-name">Промпт без скиллов</span>
+          <span class="kit-actions">
+            <button type="button" class="btn btn-s" data-copy="prompts/raw.txt">Копировать</button>
+            <a class="btn btn-s btn-ghost" href="prompts/raw.txt" download="prompt-raw.txt">Скачать</a>
+          </span>
+        </li>
+        <li class="reveal">
+          <span class="kit-name">Промпт со скиллами</span>
+          <span class="kit-actions">
+            <button type="button" class="btn btn-s" data-copy="prompts/skills.txt">Копировать</button>
+            <a class="btn btn-s btn-ghost" href="prompts/skills.txt" download="prompt-skills.txt">Скачать</a>
+          </span>
+        </li>
+        <li class="reveal">
+          <span class="kit-name">Скиллы для вложения</span>
+          <span class="kit-actions">
+            <a class="btn btn-s" href="prompts/slop-skills.md" download="slop-skills.md">Скачать slop-skills.md</a>
+          </span>
+        </li>
+      </ul>
+      <p class="kit-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="chats" class="chapter chats" aria-labelledby="chats-title">
+      <h2 id="chats-title" class="sr-only">Чаты</h2>
+      <ul class="rows">
+        <li><a href="https://t.me/prod_backend">Балюкпобеда</a><span>Неофициальный чат PROD без ботов. Айтишники Т-Банка, Яндекса и VK, жюри, участники и выпускники.</span></li>
+        <li><a href="https://t.me/+WwfExwlw5Gs1NWVi">Балюкпобеда (но с ботами)</a><span>То же самое, только ботам можно. Максимальный ИИ-мув.</span></li>
+        <li><a href="https://prodcontest.com">prodcontest.com</a><span>Настоящая олимпиада.</span></li>
+        <li><a href="{{REPO}}">GitHub</a></li>
+        <li class="rows-hello reveal">
+          <span>Залетай</span>
+          <a class="round" href="https://t.me/prod_backend" aria-label="Открыть чат Балюкпобеда в Телеграме">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" /></svg>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="board">
+    <div class="b-tile b-say">
+      <p>Фан-проект, не сайт олимпиады. Каждый слоп ровно такой, каким его выдала модель.</p>
+      <small>© 2026 slopcontest. PROD проводят Т-Технологии и Центральный университет.</small>
+    </div>
+    <nav class="b-tile b-nav" aria-label="Ещё раз разделы">
+      <a href="#vitrine">Витрина</a>
+      <a href="#compare">Сравнить</a>
+      <a href="#recipe">Рецепт</a>
+      <a href="#chats">Чаты</a>
+    </nav>
+    <div class="b-tile b-time"><p>Москва<br><span data-clock>сейчас</span></p></div>
+    <a class="b-tile b-mail" href="{{REPO}}"><span>{{REPO}}</span></a>
+    <div class="b-tile b-mark" aria-hidden="true">slopcontest</div>
+    <a class="b-tile b-cta" href="{{REPO}}">
+      <span>Принести свой слоп</span>
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 38 38 10M16 10h22v22" /></svg>
+    </a>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

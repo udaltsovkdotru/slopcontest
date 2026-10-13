@@ -1,0 +1,86 @@
+{
+  "variants": [
+    {
+      "id": "raw",
+      "label": "Без скиллов",
+      "prompt": "prompts/raw.md"
+    },
+    {
+      "id": "skills",
+      "label": "Со скиллами",
+      "prompt": "prompts/skills.md"
+    }
+  ],
+  "models": [
+    {
+      "id": "gemini-3.5-flash-lite",
+      "name": "Gemini Flash Lite 3.5",
+      "vendor": "Google",
+      "flavor": "Лайм",
+      "color": "#B8F04A",
+      "ink": "#10240A"
+    },
+    {
+      "id": "gemini-3.8-flash",
+      "name": "Gemini Flash 3.8",
+      "vendor": "Google",
+      "flavor": "Манго",
+      "color": "#FFA62B",
+      "ink": "#2A1500"
+    },
+    {
+      "id": "gemini-3.1-pro",
+      "name": "Gemini Pro 3.1",
+      "vendor": "Google",
+      "flavor": "Вишня",
+      "color": "#A3154A",
+      "ink": "#FFF4F7"
+    },
+    {
+      "id": "gemini-argon-4",
+      "name": "Gemini Argon 4",
+      "vendor": "Google",
+      "flavor": "Аргон",
+      "color": "#8FD3FF",
+      "ink": "#06202E"
+    },
+    {
+      "id": "claude-haiku-5.5",
+      "name": "Claude Haiku 5.5",
+      "vendor": "Anthropic",
+      "flavor": "Клубника",
+      "color": "#FF7A9C",
+      "ink": "#2A0010",
+      "note": "Агент в чате, без браузера и скриншотов"
+    },
+    {
+      "id": "claude-sonnet-5.5",
+      "name": "Claude Sonnet 5.5",
+      "vendor": "Anthropic",
+      "flavor": "Мята",
+      "color": "#5EE3B5",
+      "ink": "#00271A",
+      "note": "Агент в чате, без браузера и скриншотов"
+    },
+    {
+      "id": "claude-opus-5.5",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "flavor": "Шоколад",
+      "color": "#5A3220",
+      "ink": "#FFE9CC",
+      "variants": [
+        "skills"
+      ],
+      "note": "Агент со скиллами и проверкой в браузере"
+    },
+    {
+      "id": "mimo-v2.6-pro",
+      "name": "MiMo V2.6 Pro",
+      "vendor": "Xiaomi",
+      "flavor": "Матча",
+      "color": "#4E6E24",
+      "ink": "#F7FFE8"
+    }
+  ]
+}

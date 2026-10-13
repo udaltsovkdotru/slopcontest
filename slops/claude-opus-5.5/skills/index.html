@@ -1,0 +1,1698 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<!--
+Концепция: PROD — это production, и у каждого финалиста есть бейдж. Первый экран — бейдж участника на ремешке: впиши имя, выбери трек, и он твой; дальше страница собрана из канцелярии олимпиады — листы-папки, билет с бонусами, чек-маршрут этапов, бумажки с историями, картотека вопросов, оборот бейджа в подвале.
+Палитра: #00402E (поле), #003324 (глубина), #EEF3F0 (бумага), #0B1F17 (чернила), #FFDD2D (акцент), #B2C6C0 (шалфей), #0D5A47 (вода Москвариума), #F6A9C2 (Лотти).
+Шрифты: Geologica 400/500/600/700/800, Google Fonts, кириллица.
+Главная анимация: бейдж падает на ремешке и раскачивается до покоя, потом мягко качается; месяц этапа закреплён слева, пока чек прокручивается.
+Интерактив: имя и трек на бейдже (сохраняются, трек синхронизирован с вкладками треков), текущий этап по дате, четыре версии сайта без перезагрузки (#ru, #world-ru, #en, #world-en).
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Олимпиада PROD</title>
+<meta name="description" content="Состязание с практикой по промышленной разработке для школьников из любой точки мира">
+<meta name="theme-color" content="#00402E">
+<meta property="og:title" content="Олимпиада PROD">
+<meta property="og:description" content="Состязание с практикой по промышленной разработке для школьников из любой точки мира">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2300402E%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%2218%22%20height%3D%2236%22%20rx%3D%229%22%20fill%3D%22none%22%20stroke%3D%22%23FFDD2D%22%20stroke-width%3D%225%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2214%22%20width%3D%2218%22%20height%3D%2236%22%20rx%3D%229%22%20fill%3D%22none%22%20stroke%3D%22%23FFDD2D%22%20stroke-width%3D%225%22%2F%3E%3Crect%20x%3D%2234%22%20y%3D%2214%22%20width%3D%2218%22%20height%3D%2236%22%20rx%3D%229%22%20fill%3D%22none%22%20stroke%3D%22%23FFDD2D%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700;800&display=swap">
+<style>
+:root {
+  --green: #00402E;
+  --deep: #003324;
+  --sage: #B2C6C0;
+  --paper: #EEF3F0;
+  --yellow: #FFDD2D;
+  --ink: #0B1F17;
+  --water: #0D5A47;
+  --pink: #F6A9C2;
+  --pink-deep: #D9738F;
+
+  --font: "Geologica", system-ui, sans-serif;
+  --step-small: 0.9375rem;
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.3rem, 1.1rem + 0.9vw, 1.875rem);
+  --step-head: clamp(2.5rem, 1.4rem + 4.4vw, 5.25rem);
+  --step-display: clamp(3.25rem, 1.2rem + 8.4vw, 9.5rem);
+
+  --m: clamp(16px, 3vw, 48px);
+  --gap: clamp(96px, 11vw, 176px);
+  --bar-h: 72px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --t-press: 140ms;
+  --t-hover: 180ms;
+  --t-reveal: 800ms;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: calc(var(--bar-h) + 12px); }
+body {
+  margin: 0; background: var(--green); color: var(--paper);
+  font: 400 var(--step-body)/1.45 var(--font); letter-spacing: -0.01em;
+  overflow-x: clip;
+}
+h1, h2, h3, h4, p, ul, ol, figure, fieldset { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+fieldset { border: 0; padding: 0; }
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 2px; }
+::selection { background: var(--yellow); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+.light :focus-visible { outline-color: var(--ink); }
+.skip { position: absolute; left: var(--m); top: -100px; z-index: 50; padding: 12px 18px; background: var(--yellow); color: var(--ink); font-weight: 600; }
+.skip:focus { top: 12px; }
+h2 { font: 800 var(--step-head)/0.92 var(--font); letter-spacing: -0.05em; max-width: 13ch; }
+h3 { font: 800 var(--step-lead)/1.05 var(--font); letter-spacing: -0.04em; }
+
+/* Кнопки: одна форма — прямоугольник с мягким углом бейджа */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 26px;
+  border: 0; border-radius: 10px; background: var(--yellow); color: var(--ink);
+  font: 600 var(--step-small)/1.1 var(--font); text-decoration: none; text-align: center; cursor: pointer;
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-hover) ease;
+}
+.btn:hover { background: var(--paper); }
+.btn:active { transform: scale(0.96); }
+.btn-ink { background: var(--ink); color: var(--yellow); }
+.btn-ink:hover { background: var(--green); }
+.btn-s { min-height: 48px; }
+.btn-block { width: 100%; }
+.link { font-weight: 600; }
+
+/* Шапка */
+.bar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 20px;
+  min-height: var(--bar-h); padding: 10px var(--m);
+  background: var(--green);
+}
+.logo { width: 108px; height: auto; display: block; }
+.logo text { font: 800 44px/1 var(--font); fill: currentColor; letter-spacing: -2px; }
+.logo-o rect { fill: none; stroke: currentColor; stroke-width: 5; }
+.bar-logo { color: var(--paper); flex: none; }
+.bar-nav { flex: 1; }
+.bar-nav ul { display: flex; flex-wrap: wrap; gap: 2px 18px; }
+.bar-nav a { display: inline-block; padding: 8px 0; text-decoration: none; font: 500 var(--step-small)/1.2 var(--font); }
+.bar-nav a:hover { color: var(--yellow); }
+.switches { display: flex; gap: 8px; flex: none; }
+.seg { display: flex; padding: 3px; border-radius: 12px; background: var(--deep); }
+.seg button {
+  min-height: 38px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--paper);
+  font: 500 var(--step-small)/1 var(--font); cursor: pointer;
+  transition: background-color var(--t-hover) ease, color var(--t-hover) ease, transform var(--t-press) var(--ease-out);
+}
+.seg button:active { transform: scale(0.95); }
+.seg button[aria-pressed="true"] { background: var(--yellow); color: var(--ink); }
+.menu-btn { display: none; }
+
+/* Первый экран: бейдж участника на ремешке */
+.hero {
+  position: relative;
+  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px clamp(24px, 4vw, 72px);
+  align-items: center;
+  min-height: calc(100svh - var(--bar-h));
+  padding: clamp(24px, 4vw, 48px) var(--m) clamp(56px, 7vw, 96px);
+}
+.hero h1 { font: 800 var(--step-display)/0.86 var(--font); letter-spacing: -0.06em; color: var(--yellow); max-width: 8ch; }
+.hero-full { margin-top: 28px; font: 600 var(--step-lead)/1.15 var(--font); letter-spacing: -0.03em; max-width: 24ch; }
+.hero-sub { margin-top: 16px; max-width: 42ch; color: var(--sage); }
+.hero-slogan { margin-top: 16px; font-weight: 600; }
+.hero-slogan span { color: var(--yellow); }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 32px; }
+
+.badge-wrap { position: relative; justify-self: center; width: min(100%, 380px); padding-top: 64px; }
+.lanyard {
+  position: absolute; left: 50%; bottom: calc(100% - 92px); width: 40px; height: 100svh; translate: -50% 0;
+  background: var(--yellow);
+}
+.badge {
+  position: relative; aspect-ratio: 5 / 7.2;
+  display: grid; grid-template-rows: auto 1fr auto auto auto; gap: 10px;
+  padding: 0 0 20px; border-radius: 18px; overflow: hidden;
+  background: var(--paper); color: var(--ink);
+  transform-origin: 50% -40px;
+}
+.badge::before { /* прорезь под ремешок */
+  content: ""; position: absolute; top: 12px; left: 50%; width: 64px; height: 12px; translate: -50% 0;
+  border-radius: 6px; background: var(--green); z-index: 1;
+}
+.badge-top { display: flex; align-items: center; justify-content: space-between; padding: 34px 20px 12px; background: var(--yellow); }
+.badge-top .logo { width: 92px; color: var(--ink); }
+.badge-top span { font: 600 var(--step-small)/1 var(--font); }
+.badge-photo { display: grid; place-items: center; margin: 4px 20px 0; border-radius: 12px; background: var(--sage); overflow: hidden; }
+.badge-photo .lotti { width: 74%; translate: 0 8%; }
+.badge-name { padding: 0 20px; font: 800 clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem)/0.98 var(--font); letter-spacing: -0.05em; overflow-wrap: anywhere; min-height: 1em; }
+.badge-track { margin: 0 20px; justify-self: start; padding: 6px 12px; border-radius: 8px; background: var(--green); color: var(--yellow); font: 600 var(--step-small)/1 var(--font); }
+.badge-foot { display: flex; justify-content: space-between; gap: 12px; padding: 0 20px; font-size: var(--step-small); color: #3B5249; }
+.badge-form { display: grid; gap: 14px; margin-top: 20px; }
+.badge-form label > span, .badge-form legend { display: block; margin-bottom: 6px; font: 500 var(--step-small)/1.2 var(--font); color: var(--sage); }
+.badge-form input[type="text"] {
+  width: 100%; min-height: 50px; padding: 0 16px; border: 0; border-radius: 10px;
+  background: var(--deep); color: var(--paper); font: 500 var(--step-body)/1 var(--font);
+}
+.badge-form input[type="text"]::placeholder { color: #7FA197; }
+.chips { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.badge-form .chip > span { display: flex; width: 100%; margin: 0; color: var(--paper); font: 500 var(--step-small)/1.15 var(--font); }
+.badge-form .chip input:checked + span { color: var(--ink); }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.chip span {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px;
+  background: var(--deep); font: 500 var(--step-small)/1 var(--font);
+  transition: background-color var(--t-hover) ease, transform var(--t-press) var(--ease-out);
+}
+.chip input:checked + span { background: var(--paper); color: var(--ink); }
+.chip input:focus-visible + span { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.chip:active span { transform: scale(0.95); }
+
+/* Лотти */
+.lotti { display: block; overflow: visible; }
+.lotti-head { fill: var(--pink); }
+.lotti-gills-l path, .lotti-gills-r path { fill: none; stroke: var(--pink-deep); stroke-width: 9; stroke-linecap: round; }
+.lotti-eye { fill: var(--ink); }
+.lotti-shine { fill: #fff; }
+.lotti-mouth { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+.lotti-cheek { fill: var(--pink-deep); opacity: 0.55; }
+.lotti-gills-l { transform-origin: 70px 84px; }
+.lotti-gills-r { transform-origin: 170px 84px; }
+
+/* Об олимпиаде: листы-папки, которые наезжают друг на друга */
+.about { padding: var(--gap) var(--m) 0; }
+.about > h2 { margin-bottom: 48px; }
+.sheets { margin: 0 calc(var(--m) * -1); }
+.sheet {
+  position: sticky; top: calc(var(--bar-h) + var(--n) * 64px);
+  min-height: 54svh; padding: 14px var(--m) 48px;
+  display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); grid-template-rows: 50px 1fr; gap: 24px clamp(24px, 4vw, 72px);
+}
+.sheet h3 { grid-column: 1 / -1; font-size: clamp(1.25rem, 1rem + 1.2vw, 2rem); }
+.sheet p { grid-column: 2; align-self: end; max-width: 40ch; font: 600 var(--step-lead)/1.2 var(--font); letter-spacing: -0.03em; }
+.sheet::after {
+  content: ""; grid-column: 1; grid-row: 2; align-self: end; justify-self: start;
+  width: clamp(120px, 18vw, 260px); aspect-ratio: 1 / 1.6; border-radius: 999px;
+  border: clamp(14px, 2vw, 28px) solid currentColor; opacity: 0.12;
+}
+.sheet-lotti { grid-column: 1; grid-row: 2; align-self: end; width: clamp(160px, 22vw, 320px); }
+.sheet-5::after { display: none; }
+.sheet-1 { background: var(--paper); color: var(--ink); }
+.sheet-2 { background: var(--yellow); color: var(--ink); }
+.sheet-3 { background: var(--sage); color: var(--ink); }
+.sheet-4 { background: var(--deep); color: var(--paper); }
+.sheet-5 { background: var(--pink); color: var(--ink); }
+.opps { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px 48px; padding: var(--gap) 0; background: var(--green); }
+.opps li { padding: 20px 0; font: 600 var(--step-lead)/1.2 var(--font); letter-spacing: -0.03em; }
+.opps li + li { border-top: 2px solid var(--deep); }
+
+/* Бонусы: билет с перфорацией */
+.bonuses { background: var(--deep); padding: var(--gap) var(--m); }
+.bonuses > h2 { margin-bottom: 48px; }
+.ticket { position: relative; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); max-width: 1240px; }
+.ticket::before, .ticket::after {
+  content: ""; position: absolute; left: 70%; width: 32px; height: 32px; translate: -50% 0; border-radius: 50%; background: var(--deep); z-index: 1;
+}
+.ticket::before { top: -16px; }
+.ticket::after { bottom: -16px; }
+.ticket-main { padding: clamp(24px, 3vw, 44px); border-radius: 18px 0 0 18px; background: var(--paper); color: var(--ink); }
+.ticket-main h3 { font-size: var(--step-lead); margin-bottom: 24px; }
+.perks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 32px; }
+.perks li { display: grid; gap: 4px; align-content: start; }
+.perks b { font-weight: 700; }
+.perks small { font-size: var(--step-small); color: #4A5F57; }
+.ticket-stub {
+  display: grid; align-content: space-between; gap: 20px;
+  padding: clamp(24px, 3vw, 40px); border-radius: 0 18px 18px 0; background: var(--yellow); color: var(--ink);
+  border-left: 6px dotted var(--deep);
+}
+.stub-big { font: 800 clamp(2.75rem, 1.4rem + 4vw, 5.5rem)/0.9 var(--font); letter-spacing: -0.06em; }
+.stub-note { font-weight: 600; max-width: 18ch; }
+.table-wrap { margin-top: 40px; max-width: 1240px; }
+.table-wrap summary {
+  display: flex; align-items: center; justify-content: space-between; min-height: 60px; padding: 0 20px;
+  border-radius: 10px; background: var(--green); font: 600 var(--step-body)/1.2 var(--font); cursor: pointer; list-style: none;
+}
+.table-wrap summary::-webkit-details-marker { display: none; }
+.table-wrap summary::after { content: "+"; font-size: 1.6em; line-height: 1; transition: transform var(--t-hover) var(--ease-out); }
+.table-wrap[open] summary::after { transform: rotate(45deg); }
+table { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: var(--step-small); }
+th { text-align: left; padding: 14px 16px; color: var(--sage); font-weight: 500; }
+td { padding: 14px 16px; vertical-align: top; border-top: 2px solid var(--green); }
+td:last-child { font-weight: 600; }
+.fine { margin-top: 20px; max-width: 70ch; font-size: var(--step-small); color: var(--sage); }
+
+/* Этапы: чек-маршрут и закреплённый месяц */
+.stages {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px clamp(24px, 5vw, 96px);
+  padding: var(--gap) var(--m); background: var(--yellow); color: var(--ink);
+}
+.stages-pin { position: sticky; top: calc(var(--bar-h) + 32px); align-self: start; display: grid; gap: 20px; }
+.stages-pin > p { max-width: 36ch; }
+.now { display: grid; gap: 8px; margin-top: 16px; }
+.now b { font: 800 clamp(2rem, 1.2rem + 3vw, 4rem)/0.95 var(--font); letter-spacing: -0.05em; max-width: 12ch; }
+.now-when { font: 600 var(--step-lead)/1.1 var(--font); letter-spacing: -0.03em; }
+.slip {
+  align-self: start; width: min(100%, 560px); justify-self: end;
+  padding: 28px 28px 52px; background: var(--paper);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), 96% 100%, 92% calc(100% - 14px), 88% 100%, 84% calc(100% - 14px), 80% 100%, 76% calc(100% - 14px), 72% 100%, 68% calc(100% - 14px), 64% 100%, 60% calc(100% - 14px), 56% 100%, 52% calc(100% - 14px), 48% 100%, 44% calc(100% - 14px), 40% 100%, 36% calc(100% - 14px), 32% 100%, 28% calc(100% - 14px), 24% 100%, 20% calc(100% - 14px), 16% 100%, 12% calc(100% - 14px), 8% 100%, 4% calc(100% - 14px), 0 100%);
+  font-variant-numeric: tabular-nums;
+}
+.slip li[data-step] { padding: 18px 0; transition: background-color 300ms ease; }
+.slip li[data-step] + li[data-step] { border-top: 2px solid #D5DDD8; }
+.slip-row { display: flex; align-items: baseline; gap: 10px; font-weight: 700; }
+.slip-dots { flex: 1; min-width: 24px; border-bottom: 3px dotted color-mix(in srgb, var(--ink) 45%, transparent); }
+.slip-when { text-align: right; flex: none; max-width: 48%; }
+.slip-d { margin-top: 6px; font-size: 1rem; color: #33463F; max-width: 46ch; }
+.slip-cta { display: inline-block; margin-top: 10px; font-weight: 600; font-size: var(--step-small); }
+.slip li.is-now .slip-what::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--green); vertical-align: 0.1em; }
+.slip-total { display: flex; justify-content: space-between; gap: 12px; margin: 18px -28px 0; padding: 14px 28px; background: var(--ink); color: var(--paper); font-weight: 600; }
+.tracks { grid-column: 1 / -1; display: grid; gap: 18px; margin-top: 48px; }
+.tracks > p { max-width: 52ch; }
+.track-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.track-tabs button {
+  min-height: 48px; padding: 0 18px; border: 0; border-radius: 10px; background: #F2CF16; color: var(--ink);
+  font: 600 var(--step-small)/1 var(--font); cursor: pointer;
+  transition: background-color var(--t-hover) ease, transform var(--t-press) var(--ease-out);
+}
+.track-tabs button:active { transform: scale(0.95); }
+.track-tabs button[aria-selected="true"] { background: var(--ink); color: var(--yellow); }
+.js .track-tabs { display: flex; }
+html:not(.js) .track-tabs { display: none; }
+.js .track-panel[data-hidden] { display: none; }
+.track-panel { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 12px 48px; padding: 28px; border-radius: 18px; background: var(--paper); }
+.track-panel h4 { font: 800 var(--step-lead)/1 var(--font); letter-spacing: -0.04em; }
+.track-panel > p:first-of-type { grid-column: 1; }
+.track-mat-title { grid-column: 2; grid-row: 1; font-weight: 600; }
+.track-panel ul { grid-column: 2; grid-row: 2 / span 2; display: grid; gap: 4px; }
+.track-panel li a { display: inline-block; padding: 6px 0; font-weight: 500; }
+html:not(.js) .track-panel + .track-panel { margin-top: 8px; }
+.second { margin-top: 24px; display: grid; gap: 12px; }
+.second h3 { font-size: var(--step-lead); }
+.second ul { display: grid; gap: 6px; }
+.second li::before { content: "+ "; font-weight: 700; }
+
+/* Материалы: огромное слово и полосы */
+.materials { padding: var(--gap) var(--m); }
+.mat-col { width: min(100%, 640px); margin: 0 auto; container-type: inline-size; }
+.materials h2 { max-width: none; display: grid; gap: 14px; }
+.giant { display: block; font-size: 33cqi; line-height: 0.8; letter-spacing: -0.07em; color: var(--yellow); }
+.mat-title { font-size: var(--step-lead); letter-spacing: -0.03em; }
+.mbars { display: grid; gap: 6px; margin-top: 24px; }
+.mbar { border-radius: 10px; background: var(--deep); }
+.mbar summary { display: flex; align-items: center; justify-content: space-between; min-height: 58px; padding: 0 18px; font-weight: 600; cursor: pointer; list-style: none; }
+.mbar summary::-webkit-details-marker { display: none; }
+.mbar summary::after { content: "+"; font-size: 1.6em; line-height: 1; transition: transform var(--t-hover) var(--ease-out); }
+.mbar[open] summary::after { transform: rotate(45deg); }
+.mbar-body { display: grid; gap: 14px; padding: 0 18px 20px; }
+.mbar-body p:last-child { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.materials .fine { text-align: left; }
+.results { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 5fr) auto; align-items: center; gap: 20px 40px; padding: clamp(40px, 6vw, 72px) var(--m); background: var(--paper); color: var(--ink); }
+.results h2 { font-size: clamp(2.25rem, 1.4rem + 3vw, 4rem); }
+
+/* Истории: бумажки с оторванными краями */
+.stories { padding: var(--gap) var(--m); background: var(--sage); color: var(--ink); overflow: hidden; }
+.stories-head { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); align-items: end; gap: 20px 48px; margin-bottom: 56px; }
+.stories-head p { max-width: 36ch; font: 600 var(--step-lead)/1.2 var(--font); letter-spacing: -0.03em; }
+.slips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 0 2vw; }
+.story {
+  position: relative; display: grid; gap: 10px; align-content: start;
+  margin: 0 -14px; padding: 40px 34px 48px; background: var(--paper);
+  clip-path: polygon(0 3%, 6% 0, 12% 2.4%, 18% 0, 24% 2.6%, 30% 0, 36% 2.4%, 42% 0, 48% 2.6%, 54% 0, 60% 2.4%, 66% 0, 72% 2.6%, 78% 0, 84% 2.4%, 90% 0, 96% 2.6%, 100% 0, 100% 97%, 94% 100%, 88% 97.4%, 82% 100%, 76% 97.6%, 70% 100%, 64% 97.4%, 58% 100%, 52% 97.6%, 46% 100%, 40% 97.4%, 34% 100%, 28% 97.6%, 22% 100%, 16% 97.4%, 10% 100%, 4% 97.6%, 0 100%);
+  font-size: 1rem;
+}
+.story:nth-child(1) { rotate: -3deg; }
+.story:nth-child(2) { rotate: 2deg; margin-top: 48px; }
+.story:nth-child(3) { rotate: -1.5deg; margin-top: 12px; }
+.story:nth-child(4) { rotate: 3deg; margin-top: 64px; }
+.story-ava { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--green); color: var(--yellow); font: 800 1.375rem/1 var(--font); letter-spacing: -0.04em; }
+.story h3 { font-size: var(--step-body); letter-spacing: -0.03em; }
+.story-meta { color: #4A5F57; font-weight: 500; }
+
+/* Хакатоны */
+.hack { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 32px 64px; padding: var(--gap) var(--m); background: var(--deep); }
+.hack h2 { max-width: 14ch; font-size: clamp(2.25rem, 1.3rem + 3.4vw, 4.5rem); }
+.hack-body { display: grid; gap: 16px; align-content: start; max-width: 52ch; }
+.hack-lead { margin-top: 20px; font: 600 var(--step-lead)/1.2 var(--font); letter-spacing: -0.03em; max-width: 24ch; }
+.hack-perk { font: 600 var(--step-lead)/1.2 var(--font); letter-spacing: -0.03em; color: var(--yellow); }
+.hack-body .btn { justify-self: start; margin-top: 8px; }
+
+/* FAQ: карточки в картотеке */
+.faq { padding: var(--gap) var(--m); background: var(--paper); color: var(--ink); }
+.faq h2 { margin-bottom: 56px; }
+.cards { max-width: 980px; margin: 0 auto; }
+.card {
+  --tab: calc(mod(var(--n), 4) * 22%);
+  position: relative; margin-top: -10px; padding: 0 24px; border-radius: 0 14px 14px 14px;
+  background: var(--yellow); color: var(--ink);
+}
+.card:nth-child(3n + 2) { background: var(--sage); }
+.card:nth-child(3n + 3) { background: #D7E1DB; }
+.card::before { /* вкладка */
+  content: ""; position: absolute; top: -18px; left: var(--tab, 0); width: 140px; height: 20px; border-radius: 10px 10px 0 0; background: inherit;
+}
+.card:nth-child(4n + 2)::before { left: 22%; }
+.card:nth-child(4n + 3)::before { left: 44%; }
+.card:nth-child(4n + 4)::before { left: 66%; }
+.card + .card { margin-top: 26px; }
+.card summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; padding: 10px 0; font: 600 var(--step-body)/1.25 var(--font); cursor: pointer; list-style: none; }
+.card summary::-webkit-details-marker { display: none; }
+.card summary::after { content: "+"; flex: none; font-size: 1.6em; line-height: 1; transition: transform var(--t-hover) var(--ease-out); }
+.card[open] summary::after { transform: rotate(45deg); }
+.card p { max-width: 60ch; padding-bottom: 24px; }
+
+/* Организаторы */
+.orgs { padding: var(--gap) var(--m); }
+.orgs h2 { margin-bottom: 48px; }
+.org-list { display: grid; }
+.org-list li { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 12px 48px; padding: 28px 0; }
+.org-list li + li { border-top: 2px solid var(--deep); }
+.org-list li p { max-width: 62ch; color: var(--sage); }
+.org-main h3 { font-size: clamp(2rem, 1.3rem + 2.4vw, 3.5rem); line-height: 0.95; letter-spacing: -0.05em; }
+.org-main p { color: var(--paper) !important; font: 500 var(--step-lead)/1.25 var(--font); letter-spacing: -0.02em; }
+
+/* Контакты: аквариум Москвариума и визитка */
+.contacts { position: relative; min-height: 100svh; background: var(--water); overflow: hidden; }
+.water { position: absolute; inset: 0; }
+.water .lotti { position: absolute; left: 6%; top: 18%; width: min(60vw, 720px); }
+.bubble { position: absolute; border-radius: 50%; border: 4px solid #4FA58C; }
+.b1 { width: 28px; height: 28px; left: 44%; top: 20%; }
+.b2 { width: 16px; height: 16px; left: 48%; top: 12%; }
+.b3 { width: 40px; height: 40px; left: 52%; top: 30%; }
+.visit {
+  position: relative; z-index: 1; display: grid; gap: 16px;
+  width: min(100% - 2 * var(--m), 420px); margin: 0 var(--m) 0 auto; translate: 0 clamp(56px, 8vw, 96px);
+  padding: 32px; border-radius: 14px; background: var(--paper); color: var(--ink);
+}
+.visit h2 { font-size: clamp(2rem, 1.4rem + 2vw, 3rem); }
+.visit ul { display: grid; gap: 12px; }
+.visit li { display: grid; gap: 2px; }
+.visit li a { font-weight: 700; font-size: var(--step-lead); letter-spacing: -0.03em; }
+.visit li span { font-size: var(--step-small); color: #4A5F57; }
+.visit-contact { display: grid; gap: 6px; font-weight: 600; }
+
+/* Подвал: оборот бейджа с фигурным краем */
+.back { padding: 64px var(--m) 32px; background: var(--water); }
+.back-card {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 48px;
+  max-width: 1240px; margin: 0 auto; padding: 72px clamp(24px, 4vw, 56px) 32px;
+  background: var(--paper); color: var(--ink);
+  -webkit-mask: radial-gradient(circle at 50% 0, transparent 20px, #000 21px) 0 0 / 60px 100% repeat-x;
+  mask: radial-gradient(circle at 50% 0, transparent 20px, #000 21px) 0 0 / 60px 100% repeat-x;
+}
+.back-sign { font: 800 var(--step-head)/0.92 var(--font); letter-spacing: -0.05em; max-width: 10ch; margin-bottom: 16px; }
+.back-addr { display: grid; gap: 12px; align-content: start; font: 500 var(--step-body)/1.3 var(--font); padding-right: 120px; }
+.stamp { position: absolute; top: 56px; right: clamp(24px, 4vw, 56px); width: 96px; padding: 6px; background: var(--paper); outline: 3px dashed var(--pink-deep); outline-offset: -3px; }
+.stamp .lotti { background: var(--sage); }
+.imprint { grid-column: 1 / -1; text-align: center; font-size: var(--step-small); color: #4A5F57; }
+
+/* Движение: бейдж падает на ремешке и качается — главный момент */
+@media (prefers-reduced-motion: no-preference) {
+  .js .badge { animation: hang 1.6s var(--ease-out) 0.25s both, sway 6s ease-in-out 2s infinite alternate; }
+  .js .lanyard { animation: strap 1.6s var(--ease-out) 0.25s both; }
+  .js .hero h1, .js .hero-full, .js .hero-sub, .js .hero-slogan, .js .hero-actions { animation: rise 900ms var(--ease-out) both; }
+  .js .hero-full { animation-delay: 90ms; }
+  .js .hero-sub { animation-delay: 160ms; }
+  .js .hero-slogan { animation-delay: 230ms; }
+  .js .hero-actions { animation-delay: 300ms; }
+  .lotti-gills-l { animation: gill 2.6s ease-in-out infinite alternate; }
+  .lotti-gills-r { animation: gill-r 2.6s ease-in-out infinite alternate; }
+  .water .lotti { animation: swim 9s ease-in-out infinite alternate; }
+  .bubble { animation: bubble 7s linear infinite; }
+  .b2 { animation-delay: -2s; }
+  .b3 { animation-delay: -4.5s; }
+  .badge-name.is-typed { animation: stamp 260ms var(--ease-out); }
+  .js .will-reveal { opacity: 0; transform: translateY(24px); }
+  .js .will-reveal.is-in { opacity: 1; transform: none; transition: opacity var(--t-reveal) var(--ease-out), transform var(--t-reveal) var(--ease-out); transition-delay: calc(var(--i, 0) * 75ms); }
+  .js .story.will-reveal { transform: translateY(40px); }
+  .js .story.will-reveal.is-in { transform: none; }
+  .track-panel { animation: rise 420ms var(--ease-out); }
+}
+@keyframes hang {
+  0% { transform: translateY(-70vh) rotate(-8deg); }
+  55% { transform: translateY(14px) rotate(5deg); }
+  75% { transform: translateY(-4px) rotate(-2.5deg); }
+  100% { transform: none; }
+}
+@keyframes strap { from { transform: translateY(-70vh); } to { transform: none; } }
+@keyframes sway { from { rotate: -1.4deg; } to { rotate: 1.4deg; } }
+@keyframes rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes gill { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+@keyframes gill-r { from { transform: rotate(6deg); } to { transform: rotate(-6deg); } }
+@keyframes swim { from { transform: translate(0, 0) rotate(-3deg); } to { transform: translate(4vw, 3vh) rotate(3deg); } }
+@keyframes bubble { from { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } to { transform: translateY(-60vh); opacity: 0; } }
+@keyframes stamp { from { transform: scale(1.06); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Меньше десктопа: меню под кнопкой */
+@media (max-width: 1240px) {
+  .bar { flex-wrap: wrap; }
+  .menu-btn {
+    display: inline-flex; align-items: center; margin-left: auto; min-height: 44px; padding: 0 16px;
+    border: 0; border-radius: 10px; background: var(--paper); color: var(--ink); font: 600 var(--step-small)/1 var(--font); cursor: pointer;
+  }
+  .switches { order: 3; }
+  .bar-nav { order: 4; flex-basis: 100%; }
+  .js .bar-nav { display: none; }
+  .js .bar.is-open .bar-nav { display: block; }
+  .bar-nav ul { flex-direction: column; gap: 0; padding: 8px 0 16px; }
+  .bar-nav a { padding: 12px 0; font-size: var(--step-body); }
+}
+@media (max-width: 900px) {
+  .hero, .stages, .hack, .stories-head, .results, .opps { grid-template-columns: minmax(0, 1fr); }
+  .hero { min-height: 0; }
+  .hero-copy { position: relative; z-index: 1; }
+  .lanyard { height: 120px; }
+  .badge-wrap { margin-top: 32px; }
+  .stages-pin { position: static; }
+  .slip { justify-self: stretch; width: 100%; }
+  .ticket { grid-template-columns: minmax(0, 1fr); }
+  .ticket::before, .ticket::after { top: auto; bottom: auto; left: auto; }
+  .ticket-main { border-radius: 18px 18px 0 0; }
+  .ticket-stub { border-radius: 0 0 18px 18px; border-left: 0; border-top: 6px dotted var(--deep); }
+  .ticket::before, .ticket::after { display: none; }
+  .perks { grid-template-columns: minmax(0, 1fr); }
+  .slips { grid-template-columns: minmax(0, 1fr); padding: 0; }
+  .story { width: 86%; margin: -20px 0 0; rotate: 2deg; }
+  .story:nth-child(odd) { rotate: -2deg; }
+  .story:nth-child(even) { margin-left: auto; }
+  .story:nth-child(n) { margin-top: -16px; }
+  .story:first-child { margin-top: 0; }
+  .track-panel { grid-template-columns: minmax(0, 1fr); }
+  .track-mat-title, .track-panel ul { grid-column: 1; grid-row: auto; }
+  .org-list li { grid-template-columns: minmax(0, 1fr); }
+  .back-card { grid-template-columns: minmax(0, 1fr); -webkit-mask-size: 48px 100%; mask-size: 48px 100%; }
+  .back-addr { padding-right: 0; }
+  .stamp { width: 72px; top: 48px; }
+  .back-msg { padding-right: 88px; }
+}
+@media (max-width: 640px) {
+  :root { --bar-h: 64px; }
+  .switches { width: 100%; justify-content: space-between; }
+  .seg button { padding: 0 10px; }
+  .hero h1 { font-size: 15vw; }
+  .badge-wrap { width: min(100%, 340px); }
+  .hero-actions .btn { width: 100%; }
+  .sheet { top: calc(var(--bar-h) + 52px + var(--n) * 48px); min-height: 56svh; grid-template-columns: minmax(0, 1fr); grid-template-rows: 40px auto 1fr; }
+  .sheet p { grid-column: 1; grid-row: 3; }
+  .sheet::after, .sheet-lotti { grid-row: 2; width: 96px; }
+  .sheet-lotti { width: 140px; }
+  table, thead, tbody, tr, td { display: block; }
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  tr { padding: 12px 0; border-top: 2px solid var(--green); }
+  td { border: 0; padding: 4px 0; }
+  td::before { content: attr(data-h); display: block; font-weight: 500; color: var(--sage); font-size: 0.875rem; }
+  .contacts { min-height: 0; padding-bottom: 32px; }
+  .water { position: relative; height: 60svh; }
+  .water .lotti { width: 88vw; left: 4%; top: 12%; }
+  .visit { margin: -80px var(--m) 0; translate: none; width: auto; }
+  .card::before { width: 96px; }
+}
+
+</style>
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<div id="app" data-key="ru">
+<header class="bar">
+  <a class="bar-logo" href="#top" aria-label="PROD"><svg class="logo" viewBox="0 0 172 48" role="img" aria-label="PROD"><text x="0" y="40">PR</text><g class="logo-o"><rect x="60" y="6" width="26" height="36" rx="13"/><rect x="72" y="6" width="26" height="36" rx="13"/><rect x="84" y="6" width="26" height="36" rx="13"/></g><text x="116" y="40">D</text></svg></a>
+  <nav class="bar-nav" id="site-nav" aria-label="Меню">
+    <ul><li><a href="#about">Об олимпиаде</a></li><li><a href="#bonuses">Бонусы победителям</a></li><li><a href="#stages">Сроки и этапы</a></li><li><a href="#materials">Материалы для подготовки</a></li><li><a href="#results">Результаты</a></li><li><a href="#stories">Как это было раньше</a></li><li><a href="#hackathons">Хакатоны</a></li><li><a href="#faq">Вопросы</a></li><li><a href="#contacts">Контакты</a></li></ul>
+  </nav>
+  <div class="switches">
+    <div class="seg" role="group" aria-label="Версия сайта">
+      <button type="button" data-region="ru" aria-pressed="true">Россия и СНГ</button>
+      <button type="button" data-region="world" aria-pressed="false">Для других стран</button>
+    </div>
+    <div class="seg seg-lang" role="group" aria-label="Язык">
+      <button type="button" data-lang="ru" aria-pressed="true" lang="ru">Ru</button>
+      <button type="button" data-lang="en" aria-pressed="false" lang="en">En</button>
+    </div>
+  </div>
+  <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav"><span>Меню</span></button>
+</header><main id="main">
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <h1 id="hero-title">Олимпиада PROD</h1>
+    <p class="hero-full">Международная олимпиада по промышленной разработке</p>
+    <p class="hero-sub">Состязание с практикой по программированию для школьников из любой точки мира</p>
+    <p class="hero-slogan">Попробуй себя в роли разработчика. <span>Участие бесплатное.</span></p>
+    <div class="hero-actions">
+      <a class="btn" href="https://form.centraluniversity.ru/prod_pre_reg/" target="_blank" rel="noopener">Подписаться на уведомления</a>
+      
+    </div>
+  </div>
+  <div class="badge-wrap">
+    <div class="lanyard" aria-hidden="true"></div>
+    <figure class="badge" aria-label="Бейдж участника. Впиши имя и выбери трек">
+      <div class="badge-top"><svg class="logo" viewBox="0 0 172 48" role="img" aria-label="PROD"><text x="0" y="40">PR</text><g class="logo-o"><rect x="60" y="6" width="26" height="36" rx="13"/><rect x="72" y="6" width="26" height="36" rx="13"/><rect x="84" y="6" width="26" height="36" rx="13"/></g><text x="116" y="40">D</text></svg><span>PROD 2026</span></div>
+      <div class="badge-photo"><svg class="lotti" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+  <g class="lotti-gills-l"><path d="M70 70c-22-8-34-26-34-26M66 84c-26-2-40-14-40-14M68 98c-24 6-38 0-38 0"/></g>
+  <g class="lotti-gills-r"><path d="M170 70c22-8 34-26 34-26M174 84c26-2 40-14 40-14M172 98c24 6 38 0 38 0"/></g>
+  <ellipse class="lotti-head" cx="120" cy="100" rx="64" ry="54"/>
+  <circle class="lotti-eye" cx="96" cy="94" r="7"/><circle class="lotti-eye" cx="144" cy="94" r="7"/>
+  <circle class="lotti-shine" cx="98.5" cy="91.5" r="2.2"/><circle class="lotti-shine" cx="146.5" cy="91.5" r="2.2"/>
+  <path class="lotti-mouth" d="M104 120q16 12 32 0"/>
+  <ellipse class="lotti-cheek" cx="82" cy="114" rx="9" ry="5"/><ellipse class="lotti-cheek" cx="158" cy="114" rx="9" ry="5"/>
+</svg></div>
+      <p class="badge-name" data-badge-name>Твоё имя</p>
+      <p class="badge-track" data-badge-track>Фронтенд</p>
+      <figcaption class="badge-foot"><span>Участник олимпиады</span><span>Москва, командный тур</span></figcaption>
+    </figure>
+    <form class="badge-form" onsubmit="return false">
+      <label><span>Имя на бейдже</span><input type="text" name="name" maxlength="28" autocomplete="given-name" placeholder="Твоё имя" data-badge-input></label>
+      <fieldset>
+        <legend>Трек</legend>
+        <div class="chips"><label class="chip"><input type="radio" name="badge-track" value="backend"><span>Бэкенд</span></label><label class="chip"><input type="radio" name="badge-track" value="frontend" checked><span>Фронтенд</span></label><label class="chip"><input type="radio" name="badge-track" value="mobile"><span>Мобильная разработка</span></label><label class="chip"><input type="radio" name="badge-track" value="mlops"><span>MLOps-инжиниринг</span></label></div>
+      </fieldset>
+    </form>
+  </div>
+</section>
+<section class="about" id="about" aria-labelledby="about-title">
+  <h2 id="about-title">Об олимпиаде</h2>
+  <div class="sheets">
+    <article class="sheet sheet-1" style="--n:0"><h3>Что такое промышленная разработка</h3><p>Это создание программ и технологий для миллионов пользователей. Такие продукты делают большие команды специалистов, чтобы всё работало быстро, безопасно и без ошибок.</p></article>
+    <article class="sheet sheet-2" style="--n:1"><h3>Какой формат</h3><p>Три этапа по трекам: фронтенд, бэкенд, мобильная разработка и MLOps-инжиниринг. Решаешь кейсы по выбранному направлению и создаёшь проект вместе с командой.</p></article>
+    <article class="sheet sheet-3" style="--n:2"><h3>Кому будет интересно</h3><p>Школьникам 8–11 классов, которые хотят решать прикладные задачи. Если увлекаешься кодингом и созданием приложений, это будет плюсом.</p></article>
+    <article class="sheet sheet-4" style="--n:3"><h3>Почему стоит участвовать</h3><p>Создание ИТ-систем, автоматизация процессов и разработка приложений. Настоящие задачи и сложные вызовы, такие же, как у специалистов крупных технологических компаний.</p></article>
+    <article class="sheet sheet-5" style="--n:4"><h3>Какой уровень подготовки нужен</h3><p>Для старта хватит школьной программы по информатике. Даже если только начинаешь разбираться в коде, участвуй смело: на всех этапах помогут менторы из Т-Банка, Центрального университета и НИУ ВШЭ.</p><div class="sheet-lotti" aria-hidden="true"><svg class="lotti" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+  <g class="lotti-gills-l"><path d="M70 70c-22-8-34-26-34-26M66 84c-26-2-40-14-40-14M68 98c-24 6-38 0-38 0"/></g>
+  <g class="lotti-gills-r"><path d="M170 70c22-8 34-26 34-26M174 84c26-2 40-14 40-14M172 98c24 6 38 0 38 0"/></g>
+  <ellipse class="lotti-head" cx="120" cy="100" rx="64" ry="54"/>
+  <circle class="lotti-eye" cx="96" cy="94" r="7"/><circle class="lotti-eye" cx="144" cy="94" r="7"/>
+  <circle class="lotti-shine" cx="98.5" cy="91.5" r="2.2"/><circle class="lotti-shine" cx="146.5" cy="91.5" r="2.2"/>
+  <path class="lotti-mouth" d="M104 120q16 12 32 0"/>
+  <ellipse class="lotti-cheek" cx="82" cy="114" rx="9" ry="5"/><ellipse class="lotti-cheek" cx="158" cy="114" rx="9" ry="5"/>
+</svg></div></article>
+  </div>
+  <div class="opps">
+    <h3>Что открывает PROD</h3>
+    <ul><li>Попробуешь себя в роли разработчика и вместе с командой создашь приложение или сервис</li><li>Посмотришь изнутри, как работают специалисты бигтеха, и познакомишься с экспертами из индустрии</li><li>Окажешься в комьюнити единомышленников и продолжишь общение после олимпиады</li></ul>
+  </div>
+</section>
+<section class="bonuses" id="bonuses" aria-labelledby="bonuses-title">
+  <h2 id="bonuses-title">Бонусы победителям</h2>
+  <div class="ticket">
+    <div class="ticket-main">
+      <h3>Что получат победители</h3>
+      <ul class="perks"><li><b>Мерч</b><span>Брендированный мерч олимпиады PROD</span></li><li><b>Упрощённый отбор</b><span>На стажировку в Т-Банке</span></li><li><b>Дополнительные баллы</b><span>К ЕГЭ при поступлении на программы факультета компьютерных наук НИУ ВШЭ</span><small>В соответствии с правилами приёма в НИУ ВШЭ для поступающих на бакалавриат</small></li><li><b>Фаст-трек для поступления</b><span>И грант на обучение в Центральном университете до 100%</span><small>В соответствии с положением о конкурсе на получение гранта на обучение по программам бакалавриата Центрального университета</small></li><li><b>Скидки</b><span>На совместный бакалавриат НИУ ВШЭ и Центрального университета</span><small>В соответствии с положением о скидках студентам программы бакалавриата ДРИП НИУ ВШЭ, поступившим в 2026 году</small></li></ul>
+    </div>
+    <div class="ticket-stub">
+      <p class="stub-big">до 100%</p>
+      <p class="stub-note">грант на обучение в Центральном университете</p>
+      <a class="btn btn-ink" href="https://form.centraluniversity.ru/prod_pre_reg/" target="_blank" rel="noopener">Подписаться на уведомления</a>
+    </div>
+  </div>
+  <details class="table-wrap">
+    <summary>Все бонусы по классам</summary>
+    <table>
+      <thead><tr><th scope="col">Класс</th><th scope="col">Статус</th><th scope="col">Учебное заведение</th><th scope="col">Бонус</th></tr></thead>
+      <tbody><tr><td data-h="Класс">10–11</td><td data-h="Статус">Победители заключительного этапа</td><td data-h="Учебное заведение">Центральный университет</td><td data-h="Бонус">Фаст-трек для поступления. Грант 90% на весь период обучения</td></tr><tr><td data-h="Класс">10–11</td><td data-h="Статус">Призёры заключительного этапа</td><td data-h="Учебное заведение">Центральный университет</td><td data-h="Бонус">Фаст-трек для поступления. Грант от 60% на весь период обучения</td></tr><tr><td data-h="Класс">10–11</td><td data-h="Статус">Участники заключительного этапа</td><td data-h="Учебное заведение">Центральный университет</td><td data-h="Бонус">Фаст-трек для поступления. Грант от 40% на весь период обучения</td></tr><tr><td data-h="Класс">9–11</td><td data-h="Статус">Победители, призёры и участники заключительного этапа</td><td data-h="Учебное заведение">НИУ ВШЭ и Центральный университет</td><td data-h="Бонус">Возможность получить скидку до 90% на совместный бакалавриат «Дизайн и разработка информационных продуктов»</td></tr><tr><td data-h="Класс">10–11</td><td data-h="Статус">Победители и призёры заключительного этапа</td><td data-h="Учебное заведение">НИУ ВШЭ</td><td data-h="Бонус">Дополнительные баллы к ЕГЭ при поступлении на профильные программы</td></tr><tr><td data-h="Класс">Все классы</td><td data-h="Статус">Победители и призёры заключительного этапа</td><td data-h="Учебное заведение">—</td><td data-h="Бонус">Упрощённый отбор на стажировку в Т-Банке</td></tr><tr><td data-h="Класс">Все классы</td><td data-h="Статус">Победители и призёры заключительного этапа</td><td data-h="Учебное заведение">—</td><td data-h="Бонус">Возможность в следующем году пропустить отборочные этапы олимпиады</td></tr><tr><td data-h="Класс">8</td><td data-h="Статус">Победители и призёры заключительного этапа</td><td data-h="Учебное заведение">Школа № 57 в Москве</td><td data-h="Бонус">Возможность без отбора поступить в Т-Класс, класс с углублённым изучением программирования</td></tr><tr><td data-h="Класс">Все классы</td><td data-h="Статус">Участники заключительного этапа</td><td data-h="Учебное заведение">—</td><td data-h="Бонус">Брендированный мерч олимпиады PROD</td></tr></tbody>
+    </table>
+  </details>
+  <p class="fine">Упрощённый отбор — это пропуск этапа экзаменов при отборе на стажировку. Он доступен по направлению, в котором участник стал победителем или призёром олимпиады. Гарантия трудоустройства не предоставляется.</p>
+</section>
+<section class="stages" id="stages" aria-labelledby="stages-title">
+  <div class="stages-pin">
+    <h2 id="stages-title">Сроки и этапы</h2>
+    <p>Все этапы проходят онлайн, кроме заключительного командного тура. Он пройдёт очно в Москве.</p>
+    <p class="now"><b data-now>Регистрация</b><span class="now-when"><span data-now-label>Скоро старт</span>: <span data-now-when>Ноябрь</span></span></p>
+  </div>
+  <ol class="slip">
+    <li data-step="0" data-m="11">
+      <p class="slip-row"><span class="slip-what">Регистрация</span><span class="slip-dots" aria-hidden="true"></span><span class="slip-when">Ноябрь</span></p>
+      <p class="slip-d">Оставь заявку через форму.</p>
+      <a class="slip-cta" href="https://form.centraluniversity.ru/prod_pre_reg/" target="_blank" rel="noopener">Подписаться на уведомления</a>
+    </li>
+    <li data-step="1" data-m="12">
+      <p class="slip-row"><span class="slip-what">Первый отборочный этап</span><span class="slip-dots" aria-hidden="true"></span><span class="slip-when">Декабрь</span></p>
+      <p class="slip-d">Тест на знание основ математики и программирования. На него будет 120 минут.</p>
+      
+    </li>
+    <li data-step="2" data-m="1">
+      <p class="slip-row"><span class="slip-what">Второй отборочный этап</span><span class="slip-dots" aria-hidden="true"></span><span class="slip-when">Январь</span></p>
+      <p class="slip-d">Выбери один или несколько треков и реши кейсы. Для подготовки есть примеры заданий прошлого года и записи вебинаров в телеграм-канале.</p>
+      
+    </li>
+    <li data-step="3" data-m="2">
+      <p class="slip-row"><span class="slip-what">Заключительный этап, индивидуальный тур</span><span class="slip-dots" aria-hidden="true"></span><span class="slip-when">Февраль</span></p>
+      <p class="slip-d">Разработай небольшой проект по заданию олимпиады. В помощь — вебинары от разработчиков Т-Банка, экспертов НИУ ВШЭ и Центрального университета.</p>
+      
+    </li>
+    <li data-step="4" data-m="3">
+      <p class="slip-row"><span class="slip-what">Заключительный этап, командный тур</span><span class="slip-dots" aria-hidden="true"></span><span class="slip-when">Март</span></p>
+      <p class="slip-d">Защита проектов: ИТ-решение вместе с командой и менторами, семинары и воркшопы. Площадка в Московской области: доехать до Москвы нужно самому, питание и проживание — от организаторов.</p>
+      
+    </li>
+    <li class="slip-total"><span>Итог</span><span>Победители и призёры PROD</span></li>
+  </ol>
+  <div class="tracks">
+    <h3>Треки</h3>
+    <p>Прочитай описание направлений и выбери то, что ближе: по навыкам или по желанию научиться.</p>
+    <div class="track-tabs" role="tablist" aria-label="Выбери трек">
+      <button type="button" role="tab" id="tab-backend" aria-controls="panel-backend" aria-selected="false" tabindex="-1" data-track="backend">Бэкенд</button><button type="button" role="tab" id="tab-frontend" aria-controls="panel-frontend" aria-selected="true" tabindex="0" data-track="frontend">Фронтенд</button><button type="button" role="tab" id="tab-mobile" aria-controls="panel-mobile" aria-selected="false" tabindex="-1" data-track="mobile">Мобильная разработка</button><button type="button" role="tab" id="tab-mlops" aria-controls="panel-mlops" aria-selected="false" tabindex="-1" data-track="mlops">MLOps-инжиниринг</button>
+    </div>
+    <div class="track-panel" role="tabpanel" id="panel-backend" aria-labelledby="tab-backend" data-panel="backend" data-hidden>
+      <h4>Бэкенд</h4>
+      <p>Работай над невидимой, но важной частью приложений. В ней хранятся данные, обрабатываются запросы и выполняются расчёты.</p>
+      <p class="track-mat-title">Материалы трека</p>
+      <ul><li><a href="https://stepik.org/course/551/syllabus" target="_blank" rel="noopener">Введение в базы данных</a></li><li><a href="https://stepik.org/course/67/promo" target="_blank" rel="noopener">Программирование на Python</a></li><li><a href="https://postgrespro.ru/education/books/sqlprimer" target="_blank" rel="noopener">PostgreSQL. Основы языка SQL, Е. П. Моргунов</a></li><li><a href="https://stepik.org/course/54403/promo" target="_blank" rel="noopener">Программирование на Golang</a></li><li><a href="https://git-scm.com/book/ru/v2" target="_blank" rel="noopener">Pro Git</a></li></ul>
+    </div>
+    <div class="track-panel" role="tabpanel" id="panel-frontend" aria-labelledby="tab-frontend" data-panel="frontend">
+      <h4>Фронтенд</h4>
+      <p>Делай красивые и удобные интерфейсы, видимую часть сайтов и приложений. Ты будешь разрабатывать всё, с чем взаимодействует пользователь.</p>
+      <p class="track-mat-title">Материалы трека</p>
+      <ul><li><a href="https://learn.javascript.ru/" target="_blank" rel="noopener">Современный учебник JavaScript</a></li><li><a href="https://ru.hexlet.io/courses/js-basics" target="_blank" rel="noopener">Основы JavaScript</a></li><li><a href="https://ru.hexlet.io/courses/layout-designer-basics" target="_blank" rel="noopener">Основы современной вёрстки</a></li><li><a href="https://ru.hexlet.io/courses/intro_to_git" target="_blank" rel="noopener">Введение в Git</a></li><li><a href="https://git-scm.com/book/ru/v2" target="_blank" rel="noopener">Pro Git</a></li></ul>
+    </div>
+    <div class="track-panel" role="tabpanel" id="panel-mobile" aria-labelledby="tab-mobile" data-panel="mobile" data-hidden>
+      <h4>Мобильная разработка</h4>
+      <p>Создавай приложения, которыми пользуются на телефонах: игры, сервисы и программы.</p>
+      <p class="track-mat-title">Материалы трека</p>
+      <ul><li><a href="https://habr.com/ru/companies/raiffeisenbank/articles/461803/" target="_blank" rel="noopener">Swift. Основы разработки приложений под iOS, В. Усов</a></li><li><a href="https://www.coursera.org/specializations/app-development" target="_blank" rel="noopener">iOS App Development with Swift</a></li><li><a href="https://stepik.org/course/5703/promo?search=2966113812" target="_blank" rel="noopener">Kotlin</a></li><li><a href="https://stepik.org/course/4792/promo?search=2966113813" target="_blank" rel="noopener">Разработка Android-приложений на Kotlin</a></li><li><a href="https://intuit.ru/studies/courses/3664/906/info" target="_blank" rel="noopener">Чистый код, Р. Мартин</a></li><li><a href="https://education.tbank.ru/school/basic/android/" target="_blank" rel="noopener">Android для начинающих</a></li><li><a href="https://education.tbank.ru/school/basic/ios/" target="_blank" rel="noopener">iOS для начинающих</a></li></ul>
+    </div>
+    <div class="track-panel" role="tabpanel" id="panel-mlops" aria-labelledby="tab-mlops" data-panel="mlops" data-hidden>
+      <h4>MLOps-инжиниринг</h4>
+      <p>Обучай искусственный интеллект: разрабатывай алгоритмы и модели, которые ищут закономерности в данных и решают задачи бизнеса.</p>
+      <p class="track-mat-title">Материалы трека</p>
+      <ul><li><a href="https://stepik.org/course/4852" target="_blank" rel="noopener">Введение в машинное обучение</a></li><li><a href="https://github.com/Yorko/mlcourse.ai" target="_blank" rel="noopener">Открытый курс машинного обучения</a></li><li><a href="https://habr.com/ru/companies/ods/articles/828458/" target="_blank" rel="noopener">DVC (Data Version Control)</a></li><li><a href="https://stepik.org/course/2852/promo" target="_blank" rel="noopener">MLflow</a></li></ul>
+    </div>
+    <div class="second">
+      <h3>Кто может участвовать во втором этапе</h3>
+      <ul><li>Победители и призёры первого этапа</li><li>Победители прошедших хакатонов PROD</li><li>Участники турнира «Решись!», набравшие 60 баллов из 100 за задачу по разработке</li><li>Победители и призёры второго этапа прошлого года</li></ul>
+    </div>
+  </div>
+</section>
+<section class="materials" id="materials" aria-labelledby="materials-title">
+  <div class="mat-col">
+    <h2 id="materials-title"><span class="giant" aria-hidden="true">Учись</span><span class="mat-title">Материалы для подготовки</span></h2>
+    <div class="mbars">
+      <details class="mbar" open>
+        <summary>Примеры заданий</summary>
+        <div class="mbar-body"><p>Полезные материалы с прошедших соревнований. Помогут подготовиться к каждому этапу и познакомиться с форматом заданий.</p><p><a class="btn btn-s" href="https://prodcontest.com/materials/" target="_blank" rel="noopener">Изучить</a></p></div>
+      </details>
+      <details class="mbar">
+        <summary>Демоверсия первого этапа</summary>
+        <div class="mbar-body"><p>Познакомься с платформой заранее и потренируйся.</p><p><a class="btn btn-s" href="https://interview.tbank.ru/special/prod-demo" target="_blank" rel="noopener">Тренироваться</a> <a class="link" href="https://cdn.tbank.ru/static/documents/a11903b7-df09-4e35-98c0-44e1ebb4a440.pdf" target="_blank" rel="noopener">Решения заданий демоверсии</a></p></div>
+      </details>
+      <details class="mbar">
+        <summary>Мастер-классы 2025</summary>
+        <div class="mbar-body"><p>Подготовка ко второму отборочному этапу.</p><p><a class="btn btn-s" href="https://vkvideo.ru/playlist/-223720604_2" target="_blank" rel="noopener">Смотреть</a></p></div>
+      </details>
+      <details class="mbar">
+        <summary>Мастер-классы 2024</summary>
+        <div class="mbar-body"><p>Подготовка ко второму отборочному этапу.</p><p><a class="btn btn-s" href="https://vkvideo.ru/playlist/-223720604_1" target="_blank" rel="noopener">Смотреть</a></p></div>
+      </details>
+    </div>
+    <p class="fine">Курсы, учебные пособия и онлайн-учебники по четырём направлениям — в разделе «Треки» выше.</p>
+  </div>
+</section>
+<section class="results" id="results" aria-labelledby="results-title">
+  <h2 id="results-title">Результаты</h2>
+  <p>Публикуем результаты и проходные баллы отборочных этапов.</p>
+  <a class="btn" href="https://prodcontest.com/results" target="_blank" rel="noopener">Посмотреть результаты</a>
+</section>
+<section class="stories" id="stories" aria-labelledby="stories-title">
+  <div class="stories-head">
+    <h2 id="stories-title">Истории участников</h2>
+    <p>За два года в олимпиаде поучаствовали более 8 000 школьников из 25 стран.</p>
+  </div>
+  <ul class="slips">
+    <li class="story">
+      <p class="story-ava" aria-hidden="true">ВД</p>
+      <h3>Вячеслав Дорошенко</h3>
+      <p class="story-meta">18 лет, Ростов-на-Дону</p>
+      <p>Призёр PROD 2025. После олимпиады поступил в Центральный университет по гранту и прошёл упрощённый отбор на стажировку в Т-Банк.</p><p>В команде FineDog он стажёр-фронтендер: пишет новую фичу, создаёт интерфейсы и изучает RxJS и DI в Angular.</p><p>Помогают навыки с олимпиады: гит, проектирование архитектуры, макеты и компоненты.</p>
+    </li>
+    <li class="story">
+      <p class="story-ava" aria-hidden="true">АП</p>
+      <h3>Антон Пискорский</h3>
+      <p class="story-meta">19 лет, Москва</p>
+      <p>Призёр PROD. В 2024 году поступил в Центральный университет по гранту и прошёл упрощённый отбор на стажировку в Т-Банк.</p><p>Стажировался в отделе разработки платформы обучения, получил оффер и перешёл в штат. Теперь младший бэкенд-разработчик: создаёт LMS для Центрального университета и core-сервисы.</p><p>Главное правило: не копить невыполненные задания и пробелы в материале.</p>
+    </li>
+    <li class="story">
+      <p class="story-ava" aria-hidden="true">МП</p>
+      <h3>Михаил Потанин</h3>
+      <p class="story-meta">17 лет, Москва</p>
+      <p>Стал стажёром-разработчиком в Т-Инвестициях в 17 лет. Учится в Лицее НИУ ВШЭ и работает в штаб-квартире Т-Банка.</p><p>После победы у него был фаст-трек на стажировку в Т-Банк: оставалось пройти собеседование и получить оффер.</p><p>Теперь он android-разработчик в команде платформы Т-Инвестиций: оптимизация и рефакторинг кода.</p>
+    </li>
+    <li class="story">
+      <p class="story-ava" aria-hidden="true">СГ</p>
+      <h3>Станислав Гаврилин</h3>
+      <p class="story-meta">18 лет, Оренбург</p>
+      <p>Призёр PROD 2024, а в 2025-м вернулся на финал ментором.</p><p>После года на программе «Дизайн и разработка информационных продуктов» прошёл упрощённый отбор на стажировку в Т-Банк.</p><p>Сейчас стажёр-фронтендер в команде платформы запусков: делает фронтенд MVP-версии продукта.</p>
+    </li>
+  </ul>
+</section>
+<section class="hack" id="hackathons" aria-labelledby="hack-title">
+  <div class="hack-head"><h2 id="hack-title">Хакатоны PROD</h2><p class="hack-lead">Познакомься с форматом PROD на хакатоне в своём городе</p></div>
+  <div class="hack-body">
+    <p>Хакатоны PROD — возможность попробовать формат олимпиады и создать прототип настоящего ИТ-продукта: приложения или сервиса.</p><p>Три дня: проект с командой, образовательные интенсивы и общение с экспертами.</p>
+    <p class="hack-perk">Победителям хакатонов — автопроход на второй отборочный этап олимпиады</p>
+    <a class="btn" href="https://prodcontest.com/hackathon/" target="_blank" rel="noopener">Узнать больше</a>
+  </div>
+</section>
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">Частые вопросы</h2>
+  <div class="cards">
+    <details class="card" name="faq" open style="--n:0">
+      <summary>Можно ли подать апелляцию?</summary>
+      <p>Да. Апелляцию можно подать на всех этапах, кроме командного тура заключительного этапа. Она проходит в формате опроса, где участник обосновывает, почему его решение оценили неверно.</p>
+    </details>
+    <details class="card" name="faq" style="--n:1">
+      <summary>Как проходит командный тур заключительного этапа?</summary>
+      <p>Это очный выезд в Московскую область. Финалисты собираются в команды по 3–5 человек, несколько дней работают над кейсом, а затем защищают проект.</p>
+    </details>
+    <details class="card" name="faq" style="--n:2">
+      <summary>Кто может принять участие в олимпиаде?</summary>
+      <p>Зарегистрироваться и участвовать в первом отборочном этапе могут все желающие, независимо от возраста, места учёбы и страны проживания. Продолжить со второго этапа смогут только школьники.</p>
+    </details>
+    <details class="card" name="faq" style="--n:3">
+      <summary>Будет ли отбор для участия в первом этапе?</summary>
+      <p>Нет, принять участие могут все желающие.</p>
+    </details>
+    <details class="card" name="faq" style="--n:4">
+      <summary>Как определяются победители и призёры?</summary>
+      <p>Это участники, набравшие больше всего баллов за индивидуальный и командный туры заключительного этапа. Победителей не больше 8% от числа участников заключительного этапа, победителей и призёров вместе — не больше 25%. Итоги подводим по индивидуальному зачёту за все этапы.</p>
+    </details>
+    <details class="card" name="faq" style="--n:5">
+      <summary>На каком языке проходит олимпиада?</summary>
+      <p>На русском и английском. Язык выбирается при регистрации.</p>
+    </details>
+    <details class="card" name="faq" style="--n:6">
+      <summary>Нужна ли мне виза, чтобы приехать на заключительный этап?</summary>
+      <p>Зависит от страны, в которой ты живёшь. Проверить можно на <a href="https://en.wikipedia.org/wiki/Visa_policy_of_Russia" target="_blank" rel="noopener">странице о визовой политике России</a>.</p>
+    </details>
+    <details class="card" name="faq" style="--n:7">
+      <summary>Мне помогут получить визу?</summary>
+      <p>Нет, полную визовую поддержку иностранным школьникам мы не оказываем. Если возникнут сложности, напиши на <a href="mailto:info@prodcontest.com">info@prodcontest.com</a>.</p>
+    </details>
+    <details class="card" name="faq" style="--n:8">
+      <summary>Мне оплатят перелёт в Москву?</summary>
+      <p>Нет, перелёт участников не оплачивается.</p>
+    </details>
+    <details class="card" name="faq" style="--n:9">
+      <summary>Какие расходы вы покрываете?</summary>
+      <p>Питание и проживание на весь командный тур в Москве. Дорогу до Москвы и дополнительные дни, если нужно приехать раньше или остаться после, участники оплачивают сами.</p>
+    </details>
+  </div>
+</section>
+<section class="orgs" aria-labelledby="orgs-title">
+  <h2 id="orgs-title">Организаторы и партнёры</h2>
+  <ul class="org-list"><li class="org-main"><h3>Т-Технологии</h3><p>Технологическая компания, которая развивает экосистему финансовых и лайфстайл-услуг для частных лиц и бизнеса. Финтех-продуктами команды пользуются более 51 млн человек: Т-Банк, Т-Образование, Т-Бизнес, Т-Инвестиции и другие.</p></li><li class="org-main"><h3>Центральный университет</h3><p>Российский вуз нового типа со STEM-подходом: Science, Technology, Engineering and Mathematics. Создан в партнёрстве с 60+ крупными компаниями. Студенты получают фундаментальные знания и учатся на настоящих бизнес-задачах.</p></li><li><h3>НИУ ВШЭ</h3><p>Национальный исследовательский университет, один из ведущих вузов страны, готовит сильных специалистов в сфере искусственного интеллекта.</p></li><li><h3>Факультет компьютерных наук</h3><p>Появился в 2014 году. От математики и машинного обучения до разработки и программной инженерии; учёба, наука и индустрия здесь тесно связаны.</p></li><li><h3>Антиплагиат</h3><p>Система проверки текстов на заимствования. Её продукт CodeChecker проверяет уникальность кода на втором этапе олимпиады.</p></li><li><h3>Москвариум</h3><p>Центр океанографии и морской биологии, более 12 000 водных обитателей. Здесь живёт аксолотль Лотти, символ олимпиады PROD.</p></li></ul>
+</section>
+<section class="contacts" id="contacts" aria-labelledby="contacts-title">
+  <div class="water" aria-hidden="true"><svg class="lotti" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+  <g class="lotti-gills-l"><path d="M70 70c-22-8-34-26-34-26M66 84c-26-2-40-14-40-14M68 98c-24 6-38 0-38 0"/></g>
+  <g class="lotti-gills-r"><path d="M170 70c22-8 34-26 34-26M174 84c26-2 40-14 40-14M172 98c24 6 38 0 38 0"/></g>
+  <ellipse class="lotti-head" cx="120" cy="100" rx="64" ry="54"/>
+  <circle class="lotti-eye" cx="96" cy="94" r="7"/><circle class="lotti-eye" cx="144" cy="94" r="7"/>
+  <circle class="lotti-shine" cx="98.5" cy="91.5" r="2.2"/><circle class="lotti-shine" cx="146.5" cy="91.5" r="2.2"/>
+  <path class="lotti-mouth" d="M104 120q16 12 32 0"/>
+  <ellipse class="lotti-cheek" cx="82" cy="114" rx="9" ry="5"/><ellipse class="lotti-cheek" cx="158" cy="114" rx="9" ry="5"/>
+</svg><span class="bubble b1"></span><span class="bubble b2"></span><span class="bubble b3"></span></div>
+  <div class="visit">
+    <h2 id="contacts-title">Комьюнити PROD</h2>
+    <p>Наши сообщества и контакты для связи.</p>
+    <ul><li><a href="https://t.me/t_prod" target="_blank" rel="noopener">Телеграм</a><span>Полезные материалы, истории участников, ответы на вопросы и приглашения на мероприятия</span></li><li><a href="https://vk.com/prod_olympiad" target="_blank" rel="noopener">ВКонтакте</a><span>То же самое во ВКонтакте</span></li><li><a href="https://t.me/t_prod_bot" target="_blank" rel="noopener">Бот поддержки</a><span>Отвечаем на вопросы об олимпиаде</span></li></ul>
+    <p class="visit-contact"><a href="mailto:info@prodcontest.com">info@prodcontest.com</a><a href="tel:+74956280345">+7 (495) 628-03-45</a></p>
+    <a class="btn btn-block" href="https://form.centraluniversity.ru/prod_pre_reg/" target="_blank" rel="noopener">Подписаться на уведомления</a>
+  </div>
+</section></main>
+<footer class="back">
+  <div class="back-card">
+    <div class="back-msg">
+      <p class="back-sign">До встречи на финале</p>
+      <p>Отвечаем на вопросы об олимпиаде в боте, по почте и по телефону.</p>
+    </div>
+    <ul class="back-addr">
+      <li><a href="mailto:info@prodcontest.com">info@prodcontest.com</a></li>
+      <li><a href="tel:+74956280345">+7 (495) 628-03-45</a></li>
+      <li><a href="https://t.me/t_prod" target="_blank" rel="noopener">Телеграм</a></li><li><a href="https://vk.com/prod_olympiad" target="_blank" rel="noopener">ВКонтакте</a></li><li><a href="https://t.me/t_prod_bot" target="_blank" rel="noopener">Бот поддержки</a></li>
+      <li><a href="https://cdn.tbank.ru/static/documents/92a5f058-806a-4035-86ef-e35d88c08fc0.pdf" target="_blank" rel="noopener">Положение об олимпиаде</a></li>
+    </ul>
+    <div class="stamp" aria-hidden="true"><svg class="lotti" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+  <g class="lotti-gills-l"><path d="M70 70c-22-8-34-26-34-26M66 84c-26-2-40-14-40-14M68 98c-24 6-38 0-38 0"/></g>
+  <g class="lotti-gills-r"><path d="M170 70c22-8 34-26 34-26M174 84c26-2 40-14 40-14M172 98c24 6 38 0 38 0"/></g>
+  <ellipse class="lotti-head" cx="120" cy="100" rx="64" ry="54"/>
+  <circle class="lotti-eye" cx="96" cy="94" r="7"/><circle class="lotti-eye" cx="144" cy="94" r="7"/>
+  <circle class="lotti-shine" cx="98.5" cy="91.5" r="2.2"/><circle class="lotti-shine" cx="146.5" cy="91.5" r="2.2"/>
+  <path class="lotti-mouth" d="M104 120q16 12 32 0"/>
+  <ellipse class="lotti-cheek" cx="82" cy="114" rx="9" ry="5"/><ellipse class="lotti-cheek" cx="158" cy="114" rx="9" ry="5"/>
+</svg></div>
+    <p class="imprint">© 2026, Олимпиада PROD</p>
+  </div>
+</footer></div>
+<script>
+// Тексты четырёх версий сайта. ru — «Россия и СНГ», world-ru — «Для других стран»; en и world-en — то же по-английски.
+const FORM = "https://form.centraluniversity.ru/prod_pre_reg/";
+const nb = (s) => s.replace(/ (в|и|с|к|о|у|а|на|по|из|за|до|от|не|без|для|при|об|—) /g, " $1 ").replace(/(\d) (\d{3})/g, "$1 $2");
+
+const RU = {
+  lang: "ru",
+  meta: {
+    title: "Олимпиада PROD",
+    description: "Состязание с практикой по промышленной разработке для школьников из любой точки мира",
+  },
+  ui: {
+    region: "Версия сайта", regions: { ru: "Россия и СНГ", world: "Для других стран" },
+    language: "Язык", menu: "Меню", close: "Закрыть",
+    subscribe: "Подписаться на уведомления",
+    badge: {
+      label: "Бейдж участника. Впиши имя и выбери трек",
+      name: "Имя на бейдже", placeholder: "Твоё имя", fallback: "Твоё имя",
+      track: "Трек", role: "Участник олимпиады", place: "Москва, командный тур", year: "PROD 2026",
+    },
+    now: "Сейчас", before: "Скоро старт", after: "Сезон завершён",
+    trackPick: "Выбери трек", materialsFor: "Материалы трека",
+    more: "Подробнее", table: "Все бонусы по классам",
+    tableHead: ["Класс", "Статус", "Учебное заведение", "Бонус"],
+    faqOpen: "Показать ответ", lotti: "Лотти, символ олимпиады",
+    statute: "Положение об олимпиаде",
+    phoneLabel: "Телефон", mailLabel: "Почта",
+  },
+  nav: [
+    ["about", "Об олимпиаде"], ["bonuses", "Бонусы победителям"], ["stages", "Сроки и этапы"],
+    ["materials", "Материалы для подготовки"], ["results", "Результаты"], ["stories", "Как это было раньше"],
+    ["hackathons", "Хакатоны"], ["faq", "Вопросы"], ["contacts", "Контакты"],
+  ],
+  hero: {
+    title: "Олимпиада PROD",
+    full: "Международная олимпиада по промышленной разработке",
+    sub: "Состязание с практикой по программированию для школьников из любой точки мира",
+    slogan: "Попробуй себя в роли разработчика",
+    free: "Участие бесплатное",
+  },
+  about: {
+    title: "Об олимпиаде",
+    sheets: [
+      { t: "Что такое промышленная разработка", d: "Это создание программ и технологий для миллионов пользователей. Такие продукты делают большие команды специалистов, чтобы всё работало быстро, безопасно и без ошибок." },
+      { t: "Какой формат", d: "Три этапа по трекам: фронтенд, бэкенд, мобильная разработка и MLOps-инжиниринг. Решаешь кейсы по выбранному направлению и создаёшь проект вместе с командой." },
+      { t: "Кому будет интересно", d: "Школьникам 8–11 классов, которые хотят решать прикладные задачи. Если увлекаешься кодингом и созданием приложений, это будет плюсом." },
+      { t: "Почему стоит участвовать", d: "Создание ИТ-систем, автоматизация процессов и разработка приложений. Настоящие задачи и сложные вызовы, такие же, как у специалистов крупных технологических компаний." },
+      { t: "Какой уровень подготовки нужен", d: "Для старта хватит школьной программы по информатике. Даже если только начинаешь разбираться в коде, участвуй смело: на всех этапах помогут менторы из Т-Банка, Центрального университета и НИУ ВШЭ." },
+    ],
+    oppTitle: "Что открывает PROD",
+    opps: [
+      "Попробуешь себя в роли разработчика и вместе с командой создашь приложение или сервис",
+      "Посмотришь изнутри, как работают специалисты бигтеха, и познакомишься с экспертами из индустрии",
+      "Окажешься в комьюнити единомышленников и продолжишь общение после олимпиады",
+    ],
+  },
+  bonuses: {
+    title: "Бонусы победителям",
+    ticket: { what: "Что получат победители", big: "до 100%", bigNote: "грант на обучение в Центральном университете" },
+    short: [
+      { t: "Мерч", d: "Брендированный мерч олимпиады PROD" },
+      { t: "Упрощённый отбор", d: "На стажировку в Т-Банке" },
+      { t: "Дополнительные баллы", d: "К ЕГЭ при поступлении на программы факультета компьютерных наук НИУ ВШЭ", note: "В соответствии с правилами приёма в НИУ ВШЭ для поступающих на бакалавриат" },
+      { t: "Фаст-трек для поступления", d: "И грант на обучение в Центральном университете до 100%", note: "В соответствии с положением о конкурсе на получение гранта на обучение по программам бакалавриата Центрального университета" },
+      { t: "Скидки", d: "На совместный бакалавриат НИУ ВШЭ и Центрального университета", note: "В соответствии с положением о скидках студентам программы бакалавриата ДРИП НИУ ВШЭ, поступившим в 2026 году" },
+    ],
+    rows: [
+      ["10–11", "Победители заключительного этапа", "Центральный университет", "Фаст-трек для поступления. Грант 90% на весь период обучения"],
+      ["10–11", "Призёры заключительного этапа", "Центральный университет", "Фаст-трек для поступления. Грант от 60% на весь период обучения"],
+      ["10–11", "Участники заключительного этапа", "Центральный университет", "Фаст-трек для поступления. Грант от 40% на весь период обучения"],
+      ["9–11", "Победители, призёры и участники заключительного этапа", "НИУ ВШЭ и Центральный университет", "Возможность получить скидку до 90% на совместный бакалавриат «Дизайн и разработка информационных продуктов»"],
+      ["10–11", "Победители и призёры заключительного этапа", "НИУ ВШЭ", "Дополнительные баллы к ЕГЭ при поступлении на профильные программы"],
+      ["Все классы", "Победители и призёры заключительного этапа", "—", "Упрощённый отбор на стажировку в Т-Банке"],
+      ["Все классы", "Победители и призёры заключительного этапа", "—", "Возможность в следующем году пропустить отборочные этапы олимпиады"],
+      ["8", "Победители и призёры заключительного этапа", "Школа № 57 в Москве", "Возможность без отбора поступить в Т-Класс, класс с углублённым изучением программирования"],
+      ["Все классы", "Участники заключительного этапа", "—", "Брендированный мерч олимпиады PROD"],
+    ],
+    notes: [
+      "Упрощённый отбор — это пропуск этапа экзаменов при отборе на стажировку. Он доступен по направлению, в котором участник стал победителем или призёром олимпиады. Гарантия трудоустройства не предоставляется.",
+    ],
+  },
+  stages: {
+    title: "Сроки и этапы",
+    intro: "Все этапы проходят онлайн, кроме заключительного командного тура. Он пройдёт очно в Москве.",
+    steps: [
+      { m: 11, when: "Ноябрь", t: "Регистрация", d: "Оставь заявку через форму.", cta: true },
+      { m: 12, when: "Декабрь", t: "Первый отборочный этап", d: "Тест на знание основ математики и программирования. На него будет 120 минут." },
+      { m: 1, when: "Январь", t: "Второй отборочный этап", d: "Выбери один или несколько треков и реши кейсы. Для подготовки есть примеры заданий прошлого года и записи вебинаров в телеграм-канале." },
+      { m: 2, when: "Февраль", t: "Заключительный этап, индивидуальный тур", d: "Разработай небольшой проект по заданию олимпиады. В помощь — вебинары от разработчиков Т-Банка, экспертов НИУ ВШЭ и Центрального университета." },
+      { m: 3, when: "Март", t: "Заключительный этап, командный тур", d: "Защита проектов: ИТ-решение вместе с командой и менторами, семинары и воркшопы. Площадка в Московской области: доехать до Москвы нужно самому, питание и проживание — от организаторов." },
+    ],
+    result: ["Итог", "Победители и призёры PROD"],
+    tracksTitle: "Треки",
+    tracksIntro: "Прочитай описание направлений и выбери то, что ближе: по навыкам или по желанию научиться.",
+    tracks: [
+      { id: "backend", name: "Бэкенд", d: "Работай над невидимой, но важной частью приложений. В ней хранятся данные, обрабатываются запросы и выполняются расчёты.",
+        mat: [["Введение в базы данных", "https://stepik.org/course/551/syllabus"], ["Программирование на Python", "https://stepik.org/course/67/promo"], ["PostgreSQL. Основы языка SQL, Е. П. Моргунов", "https://postgrespro.ru/education/books/sqlprimer"], ["Программирование на Golang", "https://stepik.org/course/54403/promo"], ["Pro Git", "https://git-scm.com/book/ru/v2"]] },
+      { id: "frontend", name: "Фронтенд", d: "Делай красивые и удобные интерфейсы, видимую часть сайтов и приложений. Ты будешь разрабатывать всё, с чем взаимодействует пользователь.",
+        mat: [["Современный учебник JavaScript", "https://learn.javascript.ru/"], ["Основы JavaScript", "https://ru.hexlet.io/courses/js-basics"], ["Основы современной вёрстки", "https://ru.hexlet.io/courses/layout-designer-basics"], ["Введение в Git", "https://ru.hexlet.io/courses/intro_to_git"], ["Pro Git", "https://git-scm.com/book/ru/v2"]] },
+      { id: "mobile", name: "Мобильная разработка", d: "Создавай приложения, которыми пользуются на телефонах: игры, сервисы и программы.",
+        mat: [["Swift. Основы разработки приложений под iOS, В. Усов", "https://habr.com/ru/companies/raiffeisenbank/articles/461803/"], ["iOS App Development with Swift", "https://www.coursera.org/specializations/app-development"], ["Kotlin", "https://stepik.org/course/5703/promo?search=2966113812"], ["Разработка Android-приложений на Kotlin", "https://stepik.org/course/4792/promo?search=2966113813"], ["Чистый код, Р. Мартин", "https://intuit.ru/studies/courses/3664/906/info"], ["Android для начинающих", "https://education.tbank.ru/school/basic/android/"], ["iOS для начинающих", "https://education.tbank.ru/school/basic/ios/"]] },
+      { id: "mlops", name: "MLOps-инжиниринг", d: "Обучай искусственный интеллект: разрабатывай алгоритмы и модели, которые ищут закономерности в данных и решают задачи бизнеса.",
+        mat: [["Введение в машинное обучение", "https://stepik.org/course/4852"], ["Открытый курс машинного обучения", "https://github.com/Yorko/mlcourse.ai"], ["DVC (Data Version Control)", "https://habr.com/ru/companies/ods/articles/828458/"], ["MLflow", "https://stepik.org/course/2852/promo"]] },
+    ],
+    secondTitle: "Кто может участвовать во втором этапе",
+    second: ["Победители и призёры первого этапа", "Победители прошедших хакатонов PROD", "Участники турнира «Решись!», набравшие 60 баллов из 100 за задачу по разработке", "Победители и призёры второго этапа прошлого года"],
+  },
+  materials: {
+    title: "Материалы для подготовки",
+    word: "Учись",
+    items: [
+      { t: "Примеры заданий", d: "Полезные материалы с прошедших соревнований. Помогут подготовиться к каждому этапу и познакомиться с форматом заданий.", href: "https://prodcontest.com/materials/", cta: "Изучить" },
+      { t: "Демоверсия первого этапа", d: "Познакомься с платформой заранее и потренируйся.", href: "https://interview.tbank.ru/special/prod-demo", cta: "Тренироваться", extra: ["Решения заданий демоверсии", "https://cdn.tbank.ru/static/documents/a11903b7-df09-4e35-98c0-44e1ebb4a440.pdf"] },
+      { t: "Мастер-классы 2025", d: "Подготовка ко второму отборочному этапу.", href: "https://vkvideo.ru/playlist/-223720604_2", cta: "Смотреть" },
+      { t: "Мастер-классы 2024", d: "Подготовка ко второму отборочному этапу.", href: "https://vkvideo.ru/playlist/-223720604_1", cta: "Смотреть" },
+    ],
+    coursesNote: "Курсы, учебные пособия и онлайн-учебники по четырём направлениям — в разделе «Треки» выше.",
+  },
+  results: { title: "Результаты", d: "Публикуем результаты и проходные баллы отборочных этапов.", href: "https://prodcontest.com/results", cta: "Посмотреть результаты" },
+  stories: {
+    title: "Истории участников",
+    intro: "За два года в олимпиаде поучаствовали более 8 000 школьников из 25 стран.",
+    people: [
+      { name: "Вячеслав Дорошенко", meta: "18 лет, Ростов-на-Дону", lines: ["Призёр PROD 2025. После олимпиады поступил в Центральный университет по гранту и прошёл упрощённый отбор на стажировку в Т-Банк.", "В команде FineDog он стажёр-фронтендер: пишет новую фичу, создаёт интерфейсы и изучает RxJS и DI в Angular.", "Помогают навыки с олимпиады: гит, проектирование архитектуры, макеты и компоненты."] },
+      { name: "Антон Пискорский", meta: "19 лет, Москва", lines: ["Призёр PROD. В 2024 году поступил в Центральный университет по гранту и прошёл упрощённый отбор на стажировку в Т-Банк.", "Стажировался в отделе разработки платформы обучения, получил оффер и перешёл в штат. Теперь младший бэкенд-разработчик: создаёт LMS для Центрального университета и core-сервисы.", "Главное правило: не копить невыполненные задания и пробелы в материале."] },
+      { name: "Михаил Потанин", meta: "17 лет, Москва", lines: ["Стал стажёром-разработчиком в Т-Инвестициях в 17 лет. Учится в Лицее НИУ ВШЭ и работает в штаб-квартире Т-Банка.", "После победы у него был фаст-трек на стажировку в Т-Банк: оставалось пройти собеседование и получить оффер.", "Теперь он android-разработчик в команде платформы Т-Инвестиций: оптимизация и рефакторинг кода."] },
+      { name: "Станислав Гаврилин", meta: "18 лет, Оренбург", lines: ["Призёр PROD 2024, а в 2025-м вернулся на финал ментором.", "После года на программе «Дизайн и разработка информационных продуктов» прошёл упрощённый отбор на стажировку в Т-Банк.", "Сейчас стажёр-фронтендер в команде платформы запусков: делает фронтенд MVP-версии продукта."] },
+    ],
+    teamTour: "Как прошёл командный тур в 2025 году",
+  },
+  hackathons: {
+    title: "Хакатоны PROD",
+    lead: "Познакомься с форматом PROD на хакатоне в своём городе",
+    d: ["Хакатоны PROD — возможность попробовать формат олимпиады и создать прототип настоящего ИТ-продукта: приложения или сервиса.", "Три дня: проект с командой, образовательные интенсивы и общение с экспертами."],
+    perk: "Победителям хакатонов — автопроход на второй отборочный этап олимпиады",
+    href: "https://prodcontest.com/hackathon/", cta: "Узнать больше",
+  },
+  faq: {
+    title: "Частые вопросы",
+    items: [
+      ["Можно ли подать апелляцию?", "Да. Апелляцию можно подать на всех этапах, кроме командного тура заключительного этапа. Она проходит в формате опроса, где участник обосновывает, почему его решение оценили неверно."],
+      ["Как проходит командный тур заключительного этапа?", "Это очный выезд в Московскую область. Финалисты собираются в команды по 3–5 человек, несколько дней работают над кейсом, а затем защищают проект."],
+      ["Кто может принять участие в олимпиаде?", "Зарегистрироваться и участвовать в первом отборочном этапе могут все желающие, независимо от возраста, места учёбы и страны проживания. Продолжить со второго этапа смогут только школьники."],
+      ["Будет ли отбор для участия в первом этапе?", "Нет, принять участие могут все желающие."],
+      ["Как определяются победители и призёры?", "Это участники, набравшие больше всего баллов за индивидуальный и командный туры заключительного этапа. Победителей не больше 8% от числа участников заключительного этапа, победителей и призёров вместе — не больше 25%. Итоги подводим по индивидуальному зачёту за все этапы."],
+      ["На каком языке проходит олимпиада?", "На русском и английском. Язык выбирается при регистрации."],
+      ["Нужна ли мне виза, чтобы приехать на заключительный этап?", "Зависит от страны, в которой ты живёшь. Проверить можно на <a href=\"https://en.wikipedia.org/wiki/Visa_policy_of_Russia\">странице о визовой политике России</a>."],
+      ["Мне помогут получить визу?", "Нет, полную визовую поддержку иностранным школьникам мы не оказываем. Если возникнут сложности, напиши на <a href=\"mailto:info@prodcontest.com\">info@prodcontest.com</a>."],
+      ["Мне оплатят перелёт в Москву?", "Нет, перелёт участников не оплачивается."],
+      ["Какие расходы вы покрываете?", "Питание и проживание на весь командный тур в Москве. Дорогу до Москвы и дополнительные дни, если нужно приехать раньше или остаться после, участники оплачивают сами."],
+    ],
+  },
+  orgs: {
+    title: "Организаторы и партнёры",
+    orgs: [
+      { name: "Т-Технологии", d: "Технологическая компания, которая развивает экосистему финансовых и лайфстайл-услуг для частных лиц и бизнеса. Финтех-продуктами команды пользуются более 51 млн человек: Т-Банк, Т-Образование, Т-Бизнес, Т-Инвестиции и другие." },
+      { name: "Центральный университет", d: "Российский вуз нового типа со STEM-подходом: Science, Technology, Engineering and Mathematics. Создан в партнёрстве с 60+ крупными компаниями. Студенты получают фундаментальные знания и учатся на настоящих бизнес-задачах." },
+    ],
+    partners: [
+      { name: "НИУ ВШЭ", d: "Национальный исследовательский университет, один из ведущих вузов страны, готовит сильных специалистов в сфере искусственного интеллекта." },
+      { name: "Факультет компьютерных наук", d: "Появился в 2014 году. От математики и машинного обучения до разработки и программной инженерии; учёба, наука и индустрия здесь тесно связаны." },
+      { name: "Антиплагиат", d: "Система проверки текстов на заимствования. Её продукт CodeChecker проверяет уникальность кода на втором этапе олимпиады." },
+      { name: "Москвариум", d: "Центр океанографии и морской биологии, более 12 000 водных обитателей. Здесь живёт аксолотль Лотти, символ олимпиады PROD." },
+    ],
+  },
+  community: {
+    title: "Комьюнити PROD",
+    d: "Наши сообщества и контакты для связи.",
+    links: [
+      { label: "Телеграм", href: "https://t.me/t_prod", d: "Полезные материалы, истории участников, ответы на вопросы и приглашения на мероприятия" },
+      { label: "ВКонтакте", href: "https://vk.com/prod_olympiad", d: "То же самое во ВКонтакте" },
+      { label: "Бот поддержки", href: "https://t.me/t_prod_bot", d: "Отвечаем на вопросы об олимпиаде" },
+    ],
+    signoff: "До встречи на финале",
+    message: "Отвечаем на вопросы об олимпиаде в боте, по почте и по телефону.",
+    statute: "https://cdn.tbank.ru/static/documents/92a5f058-806a-4035-86ef-e35d88c08fc0.pdf",
+  },
+  footer: "© 2026, Олимпиада PROD",
+};
+
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+// «Для других стран», по-русски: отличия от RU.
+const WORLD_RU = clone(RU);
+Object.assign(WORLD_RU.hero, { title: "Олимпиада PROD", full: "Международная олимпиада PROD для школьников" });
+WORLD_RU.nav.splice(7, 0, ["visa", "Виза"]);
+WORLD_RU.extLinks = { visa: "https://prodcontest.com/viza" };
+WORLD_RU.hero.appeal = ["Инструкция по подаче апелляции", "https://prodcontest.com/appeal/"];
+WORLD_RU.stages.steps = [
+  { start: [10, 30], end: [12, 2], when: "30 октября — 2 декабря", t: "Регистрация", d: "Оставь заявку через форму.", cta: true },
+  { start: [12, 5], end: [12, 8], when: "5–8 декабря", t: "Первый отборочный этап", d: "Тест на знание основ математики и программирования. На него будет 120 минут." },
+  { start: [1, 15], end: [1, 25], when: "15–25 января", t: "Второй отборочный этап", d: "Выбери один или несколько треков и реши кейсы. Для подготовки есть примеры заданий прошлого года и записи вебинаров в телеграм-канале." },
+  { start: [2, 12], end: [2, 24], when: "12–24 февраля", t: "Заключительный этап, индивидуальный тур", d: "Разработай небольшой проект по заданию олимпиады. В помощь — вебинары от специалистов из бигтеха, экспертов НИУ ВШЭ и Центрального университета." },
+  { start: [3, 13], end: [3, 18], when: "13–18 марта", t: "Заключительный этап, командный тур", d: "Защита проектов: ИТ-решение вместе с командой и менторами, семинары и воркшопы. Площадка в Московской области: доехать до Москвы нужно самому, питание и проживание — от организаторов." },
+];
+WORLD_RU.stages.second = ["Победители и призёры первого этапа", "Победители хакатонов PROD", "Победители и призёры второго этапа прошлого года"];
+WORLD_RU.bonuses.short = [
+  { t: "Мерч", d: "Брендированный мерч олимпиады PROD" },
+  { t: "Стажировка", d: "Специальные условия прохождения стажировки в одной из ведущих финтех-компаний России" },
+  { t: "Фаст-трек для поступления", d: "И грант на обучение в Центральном университете до 100%" },
+  { t: "Скидки", d: "На совместный бакалавриат НИУ ВШЭ и Центрального университета" },
+  { t: "Русский язык", d: "Бесплатная подготовительная программа по русскому языку для иностранных студентов", note: "Программа доступна с 18 лет" },
+];
+WORLD_RU.bonuses.rows = [
+  ["10–11", "Победители заключительного этапа", "Центральный университет", "Фаст-трек для поступления. Грант 100% на весь период обучения"],
+  ["10–11", "Призёры заключительного этапа", "Центральный университет", "Фаст-трек для поступления. Грант от 75% на весь период обучения"],
+  ["10–11", "Участники заключительного этапа", "Центральный университет", "Фаст-трек для поступления. Грант от 40% на весь период обучения"],
+  ["9–11", "Победители и призёры заключительного этапа", "НИУ ВШЭ и Центральный университет", "Возможность получить скидку до 90% на совместный бакалавриат «Дизайн и разработка информационных продуктов»"],
+  ["Все классы", "Победители и призёры заключительного этапа", "—", "Специальные условия прохождения стажировки в одной из ведущих финтех-компаний России"],
+  ["Все классы", "Победители и призёры заключительного этапа", "НИУ ВШЭ", "Подготовительная программа по русскому языку для иностранных студентов. Можно пройти с 18 лет"],
+  ["Все классы", "Победители и призёры заключительного этапа", "—", "Возможность в следующем году пропустить отборочные этапы олимпиады"],
+  ["Все классы", "Участники заключительного этапа", "—", "Брендированный мерч олимпиады PROD"],
+];
+WORLD_RU.bonuses.notes = [];
+WORLD_RU.stories.people[0].lines[0] = "Призёр PROD 2025. После олимпиады поступил в Центральный университет по гранту и прошёл упрощённый отбор на стажировку в финтех-компанию.";
+WORLD_RU.stories.people[1].lines[0] = "Призёр PROD. В 2024 году поступил в Центральный университет по гранту и прошёл упрощённый отбор на стажировку в одну из крупнейших финтех-компаний.";
+WORLD_RU.stories.people[2].lines = ["Стал стажёром-разработчиком уже в 17 лет. Учится в лицее Вышки и работает в бигтехе.", "После победы у него был фаст-трек на стажировку в ведущую финтех-компанию: оставалось пройти собеседование и получить оффер.", "Теперь он android-разработчик в команде инвестиционной платформы: оптимизация и рефакторинг кода."];
+WORLD_RU.stories.people[3].lines[1] = "После года на программе «Дизайн и разработка информационных продуктов» прошёл упрощённый отбор и попал на стажировку в бигтех-компанию.";
+WORLD_RU.stories.teamTour = null;
+WORLD_RU.faq.items = [
+  ...RU.faq.items.filter(([q]) => !q.startsWith("Нужна ли") && !q.startsWith("Мне помогут")),
+  ["Могу ли я поехать на командный тур с сопровождающим?", "Да. От одной страны может быть один сопровождающий для детей из этой страны. Мы оплатим ему питание и проживание на весь командный тур в Москве."],
+  ["Что входит в бесплатную программу по русскому языку от НИУ ВШЭ?", "Победители и призёры могут бесплатно пройти годовую подготовительную программу по русскому языку: два семестра, очно в Москве. Подробнее — на <a href=\"https://preparatory.hse.ru/en/ruscommercial\">сайте НИУ ВШЭ</a>."],
+  ["Нужна ли мне виза, чтобы приехать в Россию на заключительный этап?", "Зависит от страны, в которой ты живёшь. Подробнее — на <a href=\"https://prodcontest.com/viza\">странице о визе</a>."],
+  ["Мне помогут получить визу?", "Нет, полную визовую поддержку иностранным школьникам мы не оказываем. Если возникнут сложности с визой, напиши на <a href=\"mailto:info@prodcontest.com\">info@prodcontest.com</a>."],
+];
+WORLD_RU.orgs.orgs[0].d = "Технологическая компания, которая развивает экосистему финансовых и лайфстайл-услуг для частных лиц и бизнеса.";
+WORLD_RU.orgs.partners = [
+  RU.orgs.partners[0], RU.orgs.partners[1],
+  { name: "Антиплагиат", d: "Одна из ведущих российских систем проверки текстов на заимствования: около миллиона пользователей в месяц и более 300 тысяч проверок в день. Технология CodeChecker проверяет уникальность кода на втором этапе." },
+];
+WORLD_RU.community.links = [
+  { label: "Телеграм", href: "https://t.me/prod_olympiad", d: "Международный канал: полезные материалы, истории участников, ответы на вопросы и анонсы мероприятий" },
+  { label: "Бот поддержки", href: "https://t.me/t_prod_bot", d: "Отвечаем на вопросы об олимпиаде" },
+];
+WORLD_RU.community.statute = "https://cdn.tbank.ru/static/documents/statute-about-olympiad-prod.pdf";
+
+// English, «For other countries».
+const WORLD_EN = {
+  lang: "en",
+  meta: { title: "PROD Olympiad", description: "A hands-on programming competition for school students from anywhere in the world" },
+  ui: {
+    region: "Website version", regions: { ru: "Russia & CIS", world: "For other countries" },
+    language: "Language", menu: "Menu", close: "Close",
+    subscribe: "Subscribe",
+    badge: { label: "Participant badge. Type your name and pick a track", name: "Name on the badge", placeholder: "Your name", fallback: "Your name", track: "Track", role: "Olympiad participant", place: "Moscow, team stage", year: "PROD 2026" },
+    now: "Now", before: "Starting soon", after: "Season complete",
+    trackPick: "Pick a track", materialsFor: "Track materials",
+    more: "Learn more", table: "All rewards by grade",
+    tableHead: ["Grade", "Status", "Institution", "Reward"],
+    faqOpen: "Show answer", lotti: "Lottie, the Olympiad mascot",
+    statute: "Regulations of the PROD Olympiad",
+    phoneLabel: "Phone", mailLabel: "Email",
+  },
+  nav: [
+    ["about", "About the Olympiad"], ["bonuses", "Rewards for Winners"], ["stages", "Timeline & Rounds"],
+    ["materials", "Preparation Materials"], ["results", "Results"], ["stories", "Previous Olympiads"],
+    ["visa", "Visa"], ["hackathons", "Hackathons"], ["faq", "FAQ"], ["contacts", "Contacts"],
+  ],
+  extLinks: { visa: "https://prodcontest.com/eng/viza" },
+  hero: {
+    title: "PROD Olympiad",
+    full: "International PROD Olympiad for School Students",
+    sub: "A hands-on programming competition for school students from anywhere in the world",
+    slogan: "Step Into the Role of a Developer",
+    free: "Participation is free of charge",
+    appeal: ["Instructions for submitting an appeal", "https://prodcontest.com/appeal/eng"],
+  },
+  about: {
+    title: "About the Olympiad",
+    sheets: [
+      { t: "What is software engineering", d: "It’s about creating software and technologies used by millions of people. Such products are built by large teams of professionals who make sure everything runs fast, securely, and without errors." },
+      { t: "The Format", d: "The competition runs in three rounds across the following fields: frontend, backend, mobile development, and MLOps engineering. You’ll solve cases in your chosen area and create a project together with your team." },
+      { t: "Who Can Join", d: "High school students who want to tackle practical problems. If you’re passionate about coding and building apps, that’s a strong advantage." },
+      { t: "Why Take Part", d: "The Olympiad immerses you in building IT systems, automating processes, and developing apps. You’ll take on real challenges and tasks — the very same ones faced by specialists at leading tech companies." },
+      { t: "Required Level of Training", d: "The school informatics curriculum is enough to start. If you enjoy coding in your free time, that’s even better. Even if you’re just starting out, don’t hesitate to join: in every round you’ll be supported by mentors — experts from T-Bank, Central University, and HSE University." },
+    ],
+    oppTitle: "Opportunities with PROD",
+    opps: [
+      "Try out the role of a developer and build an app or service together with your team",
+      "Get a behind-the-scenes look at how big tech professionals work and meet industry experts",
+      "Join a community of like-minded peers and continue networking beyond the Olympiad",
+    ],
+  },
+  bonuses: {
+    title: "Rewards for Winners",
+    ticket: { what: "What Winners Receive", big: "up to 100%", bigNote: "scholarship at Central University" },
+    short: [
+      { t: "Exclusive branded merch", d: "Exclusive branded merch from the PROD Olympiad" },
+      { t: "Special internship", d: "Special internship opportunities at one of Russia’s leading fintech companies", note: "Prize winners may skip the exam round when applying for an internship in the same field in which they achieved their victory. Employment is not guaranteed" },
+      { t: "Fast-track admission", d: "Fast-track admission and up to a 100% scholarship at Central University", note: "In accordance with Central University’s official policy on awarding undergraduate study grants" },
+      { t: "Discounts", d: "Discounts for the joint bachelor’s degree program of HSE University and Central University", note: "In accordance with HSE University’s official policy on tuition discounts for students admitted in 2026 to the Information Product Design and Development (DRIP) bachelor’s program" },
+      { t: "Russian language foundation course", d: "Free Russian language foundation course for international students", note: "The program is available for people over the age of 18 who have graduated from high school" },
+    ],
+    rows: [
+      ["10–11", "Final round winners", "Central University", "Fast-track admission. 100% scholarship for the full study period"],
+      ["10–11", "Final round finalists", "Central University", "Fast-track admission. 75%+ scholarship for the full study period"],
+      ["10–11", "Final round participants", "Central University", "Fast-track admission. 40%+ scholarship for the full study period"],
+      ["9–11", "Final round winners and finalists", "HSE University & Central University", "Discount of up to 90% for the joint bachelor’s “Design and Development of Information Products” program"],
+      ["All grades", "Final round winners and finalists", "—", "Special internship opportunities at one of Russia’s leading fintech companies"],
+      ["All grades", "Final round winners and finalists", "HSE University", "Russian language foundation course for international students. Available for applicants aged 18 and older who have graduated from high school"],
+      ["All grades", "Final round winners and finalists", "—", "Opportunity to skip the qualifying rounds at next year’s Olympiad"],
+      ["All grades", "Final round participants", "—", "Exclusive branded merch from the PROD Olympiad"],
+    ],
+    notes: [],
+  },
+  stages: {
+    title: "Selection Process",
+    intro: "All rounds are held online, except for the final team stage — this one takes place in person in Moscow.",
+    steps: [
+      { start: [10, 30], end: [12, 2], when: "October 30 – December 2", t: "Registration", d: "Submit your application by filling out the form.", cta: true },
+      { start: [12, 5], end: [12, 8], when: "December 5–8", t: "First Preliminary Round", d: "Take a test on the basics of mathematics and programming. You’ll have 120 minutes." },
+      { start: [1, 15], end: [1, 25], when: "January 15–25", t: "Second Preliminary Round", d: "Choose one or several fields — frontend, backend, mobile development, or MLOps engineering — and solve real-world cases. To prepare, you can review last year’s sample tasks and watch webinar recordings in the Telegram channel." },
+      { start: [2, 12], end: [2, 24], when: "February 12–24", t: "Final Round, Individual Stage", d: "Develop a small project based on the Olympiad task. To support you, there will be webinars from big tech professionals, HSE University experts, and Central University faculty." },
+      { start: [3, 13], end: [3, 18], when: "March 13–18", t: "Final Round, Team Stage", d: "Create an IT solution together with your team and a mentor — an experienced developer: seminars, workshops, and project work. The event takes place in the Moscow region. You’ll need to travel to Moscow, but accommodation and meals are on us." },
+    ],
+    result: ["Result", "PROD winners and finalists"],
+    tracksTitle: "Tracks",
+    tracksIntro: "Read the track descriptions and pick what matches your skills or what you’d like to learn.",
+    tracks: [
+      { id: "backend", name: "Backend", d: "Work on the invisible but essential parts of apps: storing data, processing requests, and running calculations.",
+        mat: [["Python For Beginners", "https://www.python.org/about/gettingstarted/"], ["Python and SQLite", "https://docs.python.org/3/library/sqlite3.html"], ["Pro Git", "https://git-scm.com/book/en/v2"], ["Docker Get started", "https://docs.docker.com/get-started/"], ["Python FastAPI Tutorial", "https://fastapi.tiangolo.com/tutorial/"]] },
+      { id: "frontend", name: "Frontend", d: "Build user-friendly, visually appealing interfaces — the part of websites and apps people actually see and use.",
+        mat: [["The Modern JavaScript Tutorial", "https://javascript.info/"], ["JavaScript fundamentals", "https://javascript.info/first-steps"], ["Modern Web Design Fundamentals", "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics"], ["An Intro to Git", "https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control"]] },
+      { id: "mobile", name: "Mobile Development", d: "Create apps for smartphones — from games and services to utilities.",
+        mat: [["Head First Swift, Jon Manning & Paris Buttfield-Addison", "https://www.oreilly.com/library/view/head-first-swift/9781491923078/"], ["iOS App Development with Swift Specialization", "https://www.coursera.org/specializations/app-development"], ["Kotlin", "https://kotlinlang.org/docs/getting-started.html"], ["Meta Android UI Development Specialization", "https://www.coursera.org/specializations/meta-android-ui-development"], ["Clean Code, Robert C. Martin", "https://www.oreilly.com/library/view/clean-code-a/9780136083238/"]] },
+      { id: "mlops", name: "MLOps engineering", d: "Train artificial intelligence: design algorithms and models that find patterns in data and solve business problems.",
+        mat: [["Machine Learning Course", "https://mlcourse.ai/"], ["Kaggle Learn", "https://www.kaggle.com/learn"], ["Made With ML", "https://madewithml.com/"], ["DVC (Data Version Control)", "https://dvc.org/doc/start"], ["MLflow", "https://mlflow.org/docs/latest/index.html"], ["Triton Inference Server", "https://developer.nvidia.com/triton-inference-server"]] },
+    ],
+    secondTitle: "Who can enter the second round",
+    second: ["Winners and runner-ups of the first round", "Winners of PROD hackathons", "Winners and runner-ups of the second round from the previous year"],
+  },
+  materials: {
+    title: "Preparation Materials",
+    word: "Learn",
+    items: [
+      { t: "Sample Tasks", d: "We’ve collected useful materials from previous competitions. They’ll help you prepare for each round and get familiar with the task format.", href: "https://prodcontest.com/eng/materials", cta: "Explore" },
+      { t: "Practice", d: "Get to know the platform in advance by practicing in the demo version of the first round.", href: "https://interview.tbank.ru/special/prod-demo-en?lang=en", cta: "Practice", extra: ["Solutions to the demo tasks", "https://cdn.tbank.ru/static/documents/7477a030-3b89-48b5-b7e6-df7afdaaf1f9.pdf"] },
+    ],
+    coursesNote: "Courses, tutorials, and online textbooks for every track are listed under «Tracks» above.",
+  },
+  results: { title: "Results", d: "We publish results and passing scores of the qualifying rounds.", href: "https://prodcontest.com/eng/results", cta: "See results" },
+  stories: {
+    title: "Stories of PROD Participants",
+    intro: "Over the past two years, more than 8,000 school students from 25 countries have joined the Olympiad.",
+    people: [
+      { name: "Vyacheslav Doroshenko", meta: "18, Rostov-on-Don", lines: ["A PROD 2025 prize-winner. After the Olympiad, he enrolled at Central University with a scholarship and passed the simplified selection process for an internship at a fintech company.", "As part of the FineDog team, he works as a frontend intern, building new features, designing interfaces, and exploring RxJs and Angular DI.", "The skills he honed during the Olympiad help him every day: Git, system architecture, prototyping, and component development."] },
+      { name: "Anton Piskorskiy", meta: "19, Moscow", lines: ["A PROD prize-winner. In 2024 he enrolled at Central University with a scholarship and secured a simplified internship selection at one of the leading fintech companies.", "He interned in the learning platform development department and later joined the staff. Now a junior backend developer creating LMS solutions for Central University and core services.", "His key rule: never let unfinished tasks or gaps pile up."] },
+      { name: "Mikhail Potanin", meta: "17, Moscow", lines: ["Became a developer intern at just 17. He studies at HSE Lyceum and works at a big tech company.", "After winning the Olympiad, he had a fast-track to an internship at a leading fintech company: all he needed was to pass the interview and accept the offer.", "Today he is an Android developer on the investments platform team, focused on code optimization and refactoring."] },
+      { name: "Stanislav Gavrilin", meta: "18, Orenburg", lines: ["Became a PROD prize-winner in 2024, and a year later returned to the finals as a mentor.", "After a year in the “Design and Development of Information Products” program, he passed the simplified selection and landed an internship at a big tech company.", "Now he is a frontend intern on the launch platform team, developing the frontend for an MVP release."] },
+    ],
+    teamTour: null,
+  },
+  hackathons: {
+    title: "PROD Hackathons",
+    lead: "Experience the PROD Format at Hackathons in Your City",
+    d: ["PROD Hackathons are your chance to test-drive the Olympiad format and build a prototype of a real IT product — an app or a service.", "Hackathons last for three days: deliver a project with your team, gain new skills at learning intensives, and network with industry experts."],
+    perk: "Winners of hackathons get direct entry into the second preliminary round of the Olympiad",
+    href: "https://prodcontest.com/eng/hackathon/", cta: "Learn more",
+  },
+  faq: {
+    title: "Frequently Asked Questions",
+    items: [
+      ["Who can participate in the Olympiad?", "Anyone can register and take part in the first preliminary round, regardless of age, educational institution, or country of residence. There is no participation fee. Only school students may continue into the second round."],
+      ["Is there any selection process for the first round?", "No, everyone is welcome to join."],
+      ["How are winners and finalists determined?", "Winners and finalists are the participants who score the highest in the individual and team tours of the final round. The number of winners is capped at 8% of the finalists; winners and finalists together at 25%. The results are based on the cumulative scores across all rounds."],
+      ["What language is the Olympiad held in?", "In both Russian and English. You can choose your preferred language when registering."],
+      ["Which expenses are covered?", "We cover accommodation and meals for the entire duration of the team stage in Moscow. Travel to Moscow and any extra costs for early arrival or late departure are paid by the participants themselves."],
+      ["Can I bring a chaperone to the team tour stage?", "Yes. Each country may have one chaperone accompanying participants from that country. We will cover their accommodation and meals for the entire duration of the team stage in Moscow."],
+      ["What does the free Russian language course at HSE University include?", "Olympiad winners and runner-ups can take a one-year foundation course in Russian language at HSE University free of charge. It consists of two semesters and is held in person in Moscow. More details on the <a href=\"https://preparatory.hse.ru/en/ruscommercial\">HSE University website</a>."],
+      ["How does the team stage of the final round work?", "It takes place in the Moscow Region as an in-person event. Finalists are grouped into teams of 3–5, work on a case over several days, and then present their project."],
+      ["Do I need a visa to travel to Russia for the final round?", "It depends on the country you live in. Check the requirements on the <a href=\"https://prodcontest.com/eng/viza\">visa page</a>."],
+      ["Will you help me obtain a visa?", "No, we do not provide full visa support for international students. If you face difficulties, contact us at <a href=\"mailto:info@prodcontest.com\">info@prodcontest.com</a>."],
+      ["Will my flight to Moscow for the final round be covered?", "No, flights are not covered."],
+      ["Can I file an appeal?", "Yes. Appeals are possible in all rounds except for the team tour of the final round. The process is a survey where participants can justify why they believe their solution was graded unfairly."],
+    ],
+  },
+  orgs: {
+    title: "Organizers and Partners",
+    orgs: [
+      { name: "T-Technologies Group", d: "A tech company building an ecosystem of financial and lifestyle services for individuals and businesses." },
+      { name: "Central University", d: "A new-generation Russian university that applies the STEM approach in education: Science, Technology, Engineering and Mathematics. Established in partnership with 60+ leading companies and organizations; students gain strong fundamentals and apply them to real business challenges." },
+    ],
+    partners: [
+      { name: "HSE University", d: "A national research university and one of the country’s top universities, renowned for preparing strong AI specialists." },
+      { name: "HSE Faculty of Computer Science", d: "Founded in 2014 to train IT specialists, from mathematics and machine learning to software engineering and development." },
+      { name: "Antiplagiat", d: "One of Russia’s leading plagiarism detection systems, used by around a million people monthly, with over 300,000 checks daily. At PROD, its CodeChecker verifies code originality in the second round." },
+    ],
+  },
+  community: {
+    title: "PROD Community",
+    d: "Our social media groups and ways to get in touch.",
+    links: [
+      { label: "Telegram", href: "https://t.me/prod_olympiad", d: "Useful resources, inspiring participant stories, answers to popular questions, and upcoming events" },
+      { label: "Support Bot", href: "https://t.me/prod_iseo_bot", d: "We answer Olympiad-related questions" },
+    ],
+    signoff: "See you at the finals",
+    message: "We answer Olympiad-related questions in the bot, by email and by phone.",
+    statute: "https://cdn.tbank.ru/static/documents/regulations-of-the-prod-international-software-engineering-olympiad.pdf",
+  },
+  footer: "© 2026, PROD Olympiad",
+};
+
+// English, «Russia & CIS»: отличия от WORLD_EN.
+const EN = clone(WORLD_EN);
+EN.nav = EN.nav.filter(([id]) => id !== "visa");
+delete EN.extLinks;
+delete EN.hero.appeal;
+EN.about.sheets[2].d = "Students in grades 8–11 who want to tackle practical problems. If you’re passionate about coding and building apps, that’s a strong advantage.";
+EN.bonuses.short = [
+  { t: "Exclusive branded merch", d: "Exclusive branded merch from the PROD Olympiad" },
+  { t: "Additional Unified State Exam points", d: "Additional Unified State Exam points when applying to the HSE Faculty of Computer Science", note: "In accordance with HSE University’s official admission policies for undergraduate applicants" },
+  { t: "Fast-track admission", d: "Fast-track admission and up to a 100% scholarship at Central University", note: "In accordance with Central University’s official policy on awarding undergraduate study grants" },
+  { t: "Discounts", d: "Discounts for the joint bachelor’s degree program of HSE University and Central University" },
+  { t: "Simplified process", d: "Simplified selection process for an internship at T-Bank" },
+];
+EN.bonuses.rows = [
+  ["10–11", "Final round winners", "Central University", "Fast-track admission. 90% scholarship for the full study period"],
+  ["10–11", "Final round finalists", "Central University", "Fast-track admission. 60%+ scholarship for the full study period"],
+  ["10–11", "Final round participants", "Central University", "Fast-track admission. 40%+ scholarship for the full study period"],
+  ["9–11", "Final round winners, finalists and participants", "HSE University & Central University", "Discount of up to 90% for the joint bachelor’s “Design and Development of Information Products” program"],
+  ["10–11", "Final round winners and finalists", "HSE University", "Additional Unified State Exam points when applying to relevant programs"],
+  ["All grades", "Final round winners and finalists", "—", "Simplified selection process for an internship at T-Bank"],
+  ["All grades", "Final round winners and finalists", "—", "Opportunity to skip the qualifying rounds at next year’s Olympiad"],
+  ["8", "Final round winners and finalists", "School No. 57, Moscow", "Admission without selection to the T-Class with in-depth programming"],
+  ["All grades", "Final round participants", "—", "Exclusive branded merch from the PROD Olympiad"],
+];
+EN.bonuses.notes = ["The simplified selection means skipping the exam stage when applying for an internship, in the field in which the participant became a winner or finalist. Employment is not guaranteed."];
+EN.stages.steps[3].d = "Develop a small project based on the Olympiad task. To support you, there will be webinars from T-Bank developers, HSE University experts, and Central University faculty.";
+EN.materials.coursesNote = "Courses, tutorials, and online textbooks across four areas — frontend, backend, mobile development, and MLOps engineering — are listed under «Tracks» above.";
+EN.stories.people[0].lines[0] = "A PROD 2025 prize-winner. After the Olympiad, he enrolled at Central University with a scholarship and passed the simplified selection process for an internship at T-Bank.";
+EN.stories.people[1].lines[0] = "A PROD prize-winner. In 2024 he enrolled at Central University with a scholarship and secured a simplified internship selection at T-Bank.";
+EN.stories.people[2].lines = ["Became a developer intern at T-Investments at just 17. He studies at HSE Lyceum and works at T-Bank headquarters.", "After winning the Olympiad, he had a fast-track to an internship at T-Bank: all he needed was to pass the interview and accept the offer.", "Today he is an Android developer on the T-Investments platform team, focused on code optimization and refactoring."];
+EN.stories.people[3].lines[1] = "After a year in the “Design and Development of Information Products” program, he passed the simplified selection and landed an internship at T-Bank.";
+EN.stories.teamTour = "How the Team Stage Unfolded in 2025";
+EN.faq.items = EN.faq.items.filter(([q]) => !q.startsWith("What does the free Russian"));
+EN.orgs.orgs[0].d = "A tech company building an ecosystem of financial and lifestyle services for individuals and businesses. The T-Technologies team creates fintech products used by over 51 million people — including T-Bank, T-Education, T-Business, T-Investments, and more.";
+EN.orgs.partners = [
+  ...EN.orgs.partners.slice(0, 2),
+  { name: "Antiplagiat", d: "One of the leading systems for detecting text plagiarism. Its product CodeChecker verifies the originality of source code in the second stage of the Olympiad." },
+  { name: "Moskvarium", d: "The Moskvarium Center for Oceanography and Marine Biology, home to more than 12,000 aquatic animals — among them an axolotl named Lottie, the mascot of the PROD Olympiad." },
+];
+
+const V = { ru: RU, "world-ru": WORLD_RU, en: EN, "world-en": WORLD_EN };
+for (const v of Object.values(V)) v.form = FORM;
+for (const k of ["ru", "world-ru"]) {
+  const v = V[k];
+  v.about.sheets.forEach((s) => (s.d = nb(s.d)));
+  v.stages.steps.forEach((s) => (s.d = nb(s.d)));
+}
+
+// Разметка страницы из контента версии. Тот же код рендерит версию по умолчанию заранее (для работы без JS)
+// и все версии в браузере при переключении.
+const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
+const ext = (href, text, cls = "") => `<a${cls ? ` class="${cls}"` : ""} href="${esc(href)}" target="_blank" rel="noopener">${text}</a>`;
+
+const LOGO = `<svg class="logo" viewBox="0 0 172 48" role="img" aria-label="PROD"><text x="0" y="40">PR</text><g class="logo-o"><rect x="60" y="6" width="26" height="36" rx="13"/><rect x="72" y="6" width="26" height="36" rx="13"/><rect x="84" y="6" width="26" height="36" rx="13"/></g><text x="116" y="40">D</text></svg>`;
+
+const LOTTI = `<svg class="lotti" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+  <g class="lotti-gills-l"><path d="M70 70c-22-8-34-26-34-26M66 84c-26-2-40-14-40-14M68 98c-24 6-38 0-38 0"/></g>
+  <g class="lotti-gills-r"><path d="M170 70c22-8 34-26 34-26M174 84c26-2 40-14 40-14M172 98c24 6 38 0 38 0"/></g>
+  <ellipse class="lotti-head" cx="120" cy="100" rx="64" ry="54"/>
+  <circle class="lotti-eye" cx="96" cy="94" r="7"/><circle class="lotti-eye" cx="144" cy="94" r="7"/>
+  <circle class="lotti-shine" cx="98.5" cy="91.5" r="2.2"/><circle class="lotti-shine" cx="146.5" cy="91.5" r="2.2"/>
+  <path class="lotti-mouth" d="M104 120q16 12 32 0"/>
+  <ellipse class="lotti-cheek" cx="82" cy="114" rx="9" ry="5"/><ellipse class="lotti-cheek" cx="158" cy="114" rx="9" ry="5"/>
+</svg>`;
+
+function render(c, key) {
+  const ui = c.ui;
+  const navHref = (id) => (c.extLinks && c.extLinks[id] ? c.extLinks[id] : `#${id}`);
+  const navItem = ([id, label]) => (c.extLinks && c.extLinks[id] ? `<li>${ext(navHref(id), esc(label))}</li>` : `<li><a href="#${id}">${esc(label)}</a></li>`);
+  const region = key.startsWith("world") ? "world" : "ru";
+  const lang = c.lang;
+  const tracks = c.stages.tracks;
+
+  const header = `
+<header class="bar">
+  <a class="bar-logo" href="#top" aria-label="PROD">${LOGO}</a>
+  <nav class="bar-nav" id="site-nav" aria-label="${esc(ui.menu)}">
+    <ul>${c.nav.map(navItem).join("")}</ul>
+  </nav>
+  <div class="switches">
+    <div class="seg" role="group" aria-label="${esc(ui.region)}">
+      <button type="button" data-region="ru" aria-pressed="${region === "ru"}">${esc(ui.regions.ru)}</button>
+      <button type="button" data-region="world" aria-pressed="${region === "world"}">${esc(ui.regions.world)}</button>
+    </div>
+    <div class="seg seg-lang" role="group" aria-label="${esc(ui.language)}">
+      <button type="button" data-lang="ru" aria-pressed="${lang === "ru"}" lang="ru">Ru</button>
+      <button type="button" data-lang="en" aria-pressed="${lang === "en"}" lang="en">En</button>
+    </div>
+  </div>
+  <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav"><span>${esc(ui.menu)}</span></button>
+</header>`;
+
+  const hero = `
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <h1 id="hero-title">${esc(c.hero.title)}</h1>
+    <p class="hero-full">${esc(c.hero.full)}</p>
+    <p class="hero-sub">${esc(c.hero.sub)}</p>
+    <p class="hero-slogan">${esc(c.hero.slogan)}. <span>${esc(c.hero.free)}.</span></p>
+    <div class="hero-actions">
+      ${ext(c.form, esc(ui.subscribe), "btn")}
+      ${c.hero.appeal ? ext(c.hero.appeal[1], esc(c.hero.appeal[0]), "link") : ""}
+    </div>
+  </div>
+  <div class="badge-wrap">
+    <div class="lanyard" aria-hidden="true"></div>
+    <figure class="badge" aria-label="${esc(ui.badge.label)}">
+      <div class="badge-top">${LOGO}<span>${esc(ui.badge.year)}</span></div>
+      <div class="badge-photo">${LOTTI}</div>
+      <p class="badge-name" data-badge-name>${esc(ui.badge.fallback)}</p>
+      <p class="badge-track" data-badge-track>${esc(tracks[1].name)}</p>
+      <figcaption class="badge-foot"><span>${esc(ui.badge.role)}</span><span>${esc(ui.badge.place)}</span></figcaption>
+    </figure>
+    <form class="badge-form" onsubmit="return false">
+      <label><span>${esc(ui.badge.name)}</span><input type="text" name="name" maxlength="28" autocomplete="given-name" placeholder="${esc(ui.badge.placeholder)}" data-badge-input></label>
+      <fieldset>
+        <legend>${esc(ui.badge.track)}</legend>
+        <div class="chips">${tracks.map((t, i) => `<label class="chip"><input type="radio" name="badge-track" value="${t.id}"${i === 1 ? " checked" : ""}><span>${esc(t.name)}</span></label>`).join("")}</div>
+      </fieldset>
+    </form>
+  </div>
+</section>`;
+
+  const about = `
+<section class="about" id="about" aria-labelledby="about-title">
+  <h2 id="about-title">${esc(c.about.title)}</h2>
+  <div class="sheets">
+    ${c.about.sheets.map((s, i) => `<article class="sheet sheet-${i + 1}" style="--n:${i}"><h3>${esc(s.t)}</h3><p>${s.d}</p>${i === 4 ? `<div class="sheet-lotti" aria-hidden="true">${LOTTI}</div>` : ""}</article>`).join("\n    ")}
+  </div>
+  <div class="opps">
+    <h3>${esc(c.about.oppTitle)}</h3>
+    <ul>${c.about.opps.map((o) => `<li>${esc(o)}</li>`).join("")}</ul>
+  </div>
+</section>`;
+
+  const bonuses = `
+<section class="bonuses" id="bonuses" aria-labelledby="bonuses-title">
+  <h2 id="bonuses-title">${esc(c.bonuses.title)}</h2>
+  <div class="ticket">
+    <div class="ticket-main">
+      <h3>${esc(c.bonuses.ticket.what)}</h3>
+      <ul class="perks">${c.bonuses.short.map((b) => `<li><b>${esc(b.t)}</b><span>${esc(b.d)}</span>${b.note ? `<small>${esc(b.note)}</small>` : ""}</li>`).join("")}</ul>
+    </div>
+    <div class="ticket-stub">
+      <p class="stub-big">${esc(c.bonuses.ticket.big)}</p>
+      <p class="stub-note">${esc(c.bonuses.ticket.bigNote)}</p>
+      ${ext(c.form, esc(ui.subscribe), "btn btn-ink")}
+    </div>
+  </div>
+  <details class="table-wrap">
+    <summary>${esc(ui.table)}</summary>
+    <table>
+      <thead><tr>${ui.tableHead.map((h) => `<th scope="col">${esc(h)}</th>`).join("")}</tr></thead>
+      <tbody>${c.bonuses.rows.map((r) => `<tr>${r.map((cell, i) => `<td data-h="${esc(ui.tableHead[i])}">${esc(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table>
+  </details>
+  ${c.bonuses.notes.map((n) => `<p class="fine">${esc(n)}</p>`).join("")}
+</section>`;
+
+  const stages = `
+<section class="stages" id="stages" aria-labelledby="stages-title">
+  <div class="stages-pin">
+    <h2 id="stages-title">${esc(c.stages.title)}</h2>
+    <p>${esc(c.stages.intro)}</p>
+    <p class="now"><b data-now>${esc(c.stages.steps[0].t)}</b><span class="now-when"><span data-now-label>${esc(ui.before)}</span>: <span data-now-when>${esc(c.stages.steps[0].when)}</span></span></p>
+  </div>
+  <ol class="slip">
+    ${c.stages.steps.map((s, i) => `<li data-step="${i}"${s.m ? ` data-m="${s.m}"` : ""}${s.start ? ` data-start="${s.start.join("-")}" data-end="${s.end.join("-")}"` : ""}>
+      <p class="slip-row"><span class="slip-what">${esc(s.t)}</span><span class="slip-dots" aria-hidden="true"></span><span class="slip-when">${esc(s.when)}</span></p>
+      <p class="slip-d">${s.d}</p>
+      ${s.cta ? ext(c.form, esc(ui.subscribe), "slip-cta") : ""}
+    </li>`).join("\n    ")}
+    <li class="slip-total"><span>${esc(c.stages.result[0])}</span><span>${esc(c.stages.result[1])}</span></li>
+  </ol>
+  <div class="tracks">
+    <h3>${esc(c.stages.tracksTitle)}</h3>
+    <p>${esc(c.stages.tracksIntro)}</p>
+    <div class="track-tabs" role="tablist" aria-label="${esc(ui.trackPick)}">
+      ${tracks.map((t, i) => `<button type="button" role="tab" id="tab-${t.id}" aria-controls="panel-${t.id}" aria-selected="${i === 1}" tabindex="${i === 1 ? 0 : -1}" data-track="${t.id}">${esc(t.name)}</button>`).join("")}
+    </div>
+    ${tracks.map((t, i) => `<div class="track-panel" role="tabpanel" id="panel-${t.id}" aria-labelledby="tab-${t.id}" data-panel="${t.id}"${i === 1 ? "" : " data-hidden"}>
+      <h4>${esc(t.name)}</h4>
+      <p>${esc(t.d)}</p>
+      <p class="track-mat-title">${esc(ui.materialsFor)}</p>
+      <ul>${t.mat.map(([l, h]) => `<li>${ext(h, esc(l))}</li>`).join("")}</ul>
+    </div>`).join("\n    ")}
+    <div class="second">
+      <h3>${esc(c.stages.secondTitle)}</h3>
+      <ul>${c.stages.second.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
+    </div>
+  </div>
+</section>`;
+
+  const materials = `
+<section class="materials" id="materials" aria-labelledby="materials-title">
+  <div class="mat-col">
+    <h2 id="materials-title"><span class="giant" aria-hidden="true">${esc(c.materials.word)}</span><span class="mat-title">${esc(c.materials.title)}</span></h2>
+    <div class="mbars">
+      ${c.materials.items.map((m, i) => `<details class="mbar"${i === 0 ? " open" : ""}>
+        <summary>${esc(m.t)}</summary>
+        <div class="mbar-body"><p>${esc(m.d)}</p><p>${ext(m.href, esc(m.cta), "btn btn-s")}${m.extra ? ` ${ext(m.extra[1], esc(m.extra[0]), "link")}` : ""}</p></div>
+      </details>`).join("\n      ")}
+    </div>
+    <p class="fine">${esc(c.materials.coursesNote)}</p>
+  </div>
+</section>
+<section class="results" id="results" aria-labelledby="results-title">
+  <h2 id="results-title">${esc(c.results.title)}</h2>
+  <p>${esc(c.results.d)}</p>
+  ${ext(c.results.href, esc(c.results.cta), "btn")}
+</section>`;
+
+  const stories = `
+<section class="stories" id="stories" aria-labelledby="stories-title">
+  <div class="stories-head">
+    <h2 id="stories-title">${esc(c.stories.title)}</h2>
+    <p>${esc(c.stories.intro)}</p>
+  </div>
+  <ul class="slips">
+    ${c.stories.people.map((p) => `<li class="story">
+      <p class="story-ava" aria-hidden="true">${esc(p.name.split(" ").map((w) => w[0]).join(""))}</p>
+      <h3>${esc(p.name)}</h3>
+      <p class="story-meta">${esc(p.meta)}</p>
+      ${p.lines.map((l) => `<p>${esc(l)}</p>`).join("")}
+    </li>`).join("\n    ")}
+  </ul>
+</section>`;
+
+  const hack = `
+<section class="hack" id="hackathons" aria-labelledby="hack-title">
+  <div class="hack-head"><h2 id="hack-title">${esc(c.hackathons.title)}</h2><p class="hack-lead">${esc(c.hackathons.lead)}</p></div>
+  <div class="hack-body">
+    ${c.hackathons.d.map((d) => `<p>${esc(d)}</p>`).join("")}
+    <p class="hack-perk">${esc(c.hackathons.perk)}</p>
+    ${ext(c.hackathons.href, esc(c.hackathons.cta), "btn")}
+  </div>
+</section>`;
+
+  const faq = `
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">${esc(c.faq.title)}</h2>
+  <div class="cards">
+    ${c.faq.items.map(([q, a], i) => `<details class="card" name="faq"${i === 0 ? " open" : ""} style="--n:${i}">
+      <summary>${esc(q)}</summary>
+      <p>${a.replace(/<a href="(https?:[^"]+)">/g, '<a href="$1" target="_blank" rel="noopener">')}</p>
+    </details>`).join("\n    ")}
+  </div>
+</section>`;
+
+  const orgs = `
+<section class="orgs" aria-labelledby="orgs-title">
+  <h2 id="orgs-title">${esc(c.orgs.title)}</h2>
+  <ul class="org-list">${c.orgs.orgs.map((o) => `<li class="org-main"><h3>${esc(o.name)}</h3><p>${esc(o.d)}</p></li>`).join("")}${c.orgs.partners.map((o) => `<li><h3>${esc(o.name)}</h3><p>${esc(o.d)}</p></li>`).join("")}</ul>
+</section>`;
+
+  const contacts = `
+<section class="contacts" id="contacts" aria-labelledby="contacts-title">
+  <div class="water" aria-hidden="true">${LOTTI}<span class="bubble b1"></span><span class="bubble b2"></span><span class="bubble b3"></span></div>
+  <div class="visit">
+    <h2 id="contacts-title">${esc(c.community.title)}</h2>
+    <p>${esc(c.community.d)}</p>
+    <ul>${c.community.links.map((l) => `<li>${ext(l.href, esc(l.label))}<span>${esc(l.d)}</span></li>`).join("")}</ul>
+    <p class="visit-contact"><a href="mailto:info@prodcontest.com">info@prodcontest.com</a><a href="tel:+74956280345">+7 (495) 628-03-45</a></p>
+    ${ext(c.form, esc(ui.subscribe), "btn btn-block")}
+  </div>
+</section>`;
+
+  const footer = `
+<footer class="back">
+  <div class="back-card">
+    <div class="back-msg">
+      <p class="back-sign">${esc(c.community.signoff)}</p>
+      <p>${esc(c.community.message)}</p>
+    </div>
+    <ul class="back-addr">
+      <li><a href="mailto:info@prodcontest.com">info@prodcontest.com</a></li>
+      <li><a href="tel:+74956280345">+7 (495) 628-03-45</a></li>
+      ${c.community.links.map((l) => `<li>${ext(l.href, esc(l.label))}</li>`).join("")}
+      <li>${ext(c.community.statute, esc(ui.statute))}</li>
+    </ul>
+    <div class="stamp" aria-hidden="true">${LOTTI}</div>
+    <p class="imprint">${esc(c.footer)}</p>
+  </div>
+</footer>`;
+
+  return header + `<main id="main">` + hero + about + bonuses + stages + materials + stories + hack + faq + orgs + contacts + `</main>` + footer;
+}
+
+// Версии сайта (регион × язык), бейдж, треки, текущий этап, меню и проявления.
+(() => {
+  const root = document.documentElement;
+  const app = document.getElementById("app");
+  const KEYS = ["ru", "world-ru", "en", "world-en"];
+  const keyOf = (region, lang) => (region === "world" ? "world-" : "") + (lang === "en" ? "en" : "ru").replace(/^ru$/, "ru");
+  const norm = (region, lang) => (region === "world" ? `world-${lang}` : lang);
+  let state = { key: "ru", name: "", track: "frontend" };
+
+  try {
+    const saved = JSON.parse(localStorage.getItem("prod-badge") || "{}");
+    state.name = saved.name || "";
+    state.track = saved.track || state.track;
+  } catch {}
+
+  const fromHash = () => KEYS.includes(location.hash.slice(1)) ? location.hash.slice(1) : null;
+  let stored = null;
+  try { stored = localStorage.getItem("prod-version"); } catch {}
+  state.key = fromHash() || (KEYS.includes(stored) ? stored : "ru");
+
+  function apply(key, { keepScroll = true, focus = null } = {}) {
+    const c = V[key];
+    const y = scrollY;
+    if (app.dataset.key !== key) {
+      app.innerHTML = render(c, key);
+      app.dataset.key = key;
+    }
+    root.lang = c.lang;
+    document.title = c.meta.title;
+    document.querySelector('meta[name="description"]').content = c.meta.description;
+    try { localStorage.setItem("prod-version", key); } catch {}
+    if (location.hash.slice(1) !== key && (KEYS.includes(location.hash.slice(1)) || location.hash === "")) history.replaceState(null, "", `#${key}`);
+    state.key = key;
+    wire();
+    if (keepScroll) scrollTo({ top: y, behavior: "instant" });
+    if (focus) app.querySelector(focus)?.focus();
+  }
+
+  function wire() {
+    const region = state.key.startsWith("world") ? "world" : "ru";
+    const lang = state.key.endsWith("en") ? "en" : "ru";
+    app.querySelectorAll("[data-region]").forEach((b) => b.addEventListener("click", () => apply(norm(b.dataset.region, lang), { focus: `[data-region="${b.dataset.region}"]` })));
+    app.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => apply(norm(region, b.dataset.lang), { focus: `[data-lang="${b.dataset.lang}"]` })));
+
+    // Меню на узких экранах.
+    const bar = app.querySelector(".bar");
+    const menuBtn = app.querySelector(".menu-btn");
+    menuBtn.addEventListener("click", () => {
+      const open = bar.classList.toggle("is-open");
+      menuBtn.setAttribute("aria-expanded", String(open));
+      menuBtn.firstElementChild.textContent = open ? V[state.key].ui.close : V[state.key].ui.menu;
+    });
+    app.querySelectorAll(".bar-nav a").forEach((a) => a.addEventListener("click", () => {
+      bar.classList.remove("is-open");
+      menuBtn.setAttribute("aria-expanded", "false");
+      menuBtn.firstElementChild.textContent = V[state.key].ui.menu;
+    }));
+
+    // Бейдж: имя и трек живут между версиями.
+    const c = V[state.key];
+    const nameOut = app.querySelector("[data-badge-name]");
+    const trackOut = app.querySelector("[data-badge-track]");
+    const input = app.querySelector("[data-badge-input]");
+    const paint = () => {
+      nameOut.textContent = state.name.trim() || c.ui.badge.fallback;
+      trackOut.textContent = c.stages.tracks.find((t) => t.id === state.track).name;
+    };
+    input.value = state.name;
+    app.querySelectorAll('input[name="badge-track"]').forEach((r) => {
+      r.checked = r.value === state.track;
+      r.addEventListener("change", () => { state.track = r.value; save(); paint(); selectTrack(r.value, false); });
+    });
+    input.addEventListener("input", () => {
+      state.name = input.value; save(); paint();
+      nameOut.classList.remove("is-typed"); void nameOut.offsetWidth; nameOut.classList.add("is-typed");
+    });
+    paint();
+
+    // Треки: вкладки со стрелками.
+    const tabs = [...app.querySelectorAll('[role="tab"]')];
+    function selectTrack(id, focus) {
+      tabs.forEach((t) => {
+        const on = t.dataset.track === id;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        if (on && focus) t.focus();
+      });
+      app.querySelectorAll("[data-panel]").forEach((p) => p.toggleAttribute("data-hidden", p.dataset.panel !== id));
+    }
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => { state.track = t.dataset.track; save(); paint(); selectTrack(t.dataset.track, false); syncRadios(); });
+      t.addEventListener("keydown", (e) => {
+        const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        const n = tabs[(i + d + tabs.length) % tabs.length];
+        state.track = n.dataset.track; save(); paint(); selectTrack(n.dataset.track, true); syncRadios();
+      });
+    });
+    const syncRadios = () => app.querySelectorAll('input[name="badge-track"]').forEach((r) => (r.checked = r.value === state.track));
+    selectTrack(state.track, false);
+
+    markNow();
+    reveal();
+  }
+
+  const save = () => { try { localStorage.setItem("prod-badge", JSON.stringify({ name: state.name, track: state.track })); } catch {} };
+
+  // Текущий этап: по датам для «Для других стран», по месяцам для «России и СНГ».
+  function markNow() {
+    const c = V[state.key];
+    const now = new Date();
+    const m = now.getMonth() + 1, d = now.getDate();
+    const season = (mm) => (mm >= 9 ? mm - 9 : mm + 3); // сезон с сентября по август
+    const pos = season(m) * 100 + d;
+    const rows = [...app.querySelectorAll(".slip li[data-step]")];
+    let idx = -1, label = c.ui.before;
+    rows.forEach((r, i) => {
+      let a, b;
+      if (r.dataset.start) {
+        const [sm, sd] = r.dataset.start.split("-").map(Number), [em, ed] = r.dataset.end.split("-").map(Number);
+        a = season(sm) * 100 + sd; b = season(em) * 100 + ed;
+      } else {
+        const mm = Number(r.dataset.m); a = season(mm) * 100 + 1; b = season(mm) * 100 + 31;
+      }
+      if (pos >= a && pos <= b) idx = i;
+      else if (pos > b) { idx = Math.max(idx, -1); label = i === rows.length - 1 ? c.ui.after : label; }
+    });
+    const out = app.querySelector("[data-now]");
+    const lab = app.querySelector("[data-now-label]");
+    const when = app.querySelector("[data-now-when]");
+    const step = c.stages.steps[idx >= 0 ? idx : 0];
+    if (idx >= 0) rows[idx].classList.add("is-now");
+    lab.textContent = idx >= 0 ? c.ui.now : label;
+    out.textContent = step.t;
+    when.textContent = step.when;
+  }
+
+  // Проявление: части секций приходят по очереди, один раз.
+  function reveal() {
+    if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+    }, { rootMargin: "0px 0px -8% 0px" });
+    app.querySelectorAll("main h2, .opps li, .ticket, .slip li, .mbar, .story, .card, .org-list li, .visit, .hack-body > *, .stories-head p").forEach((el) => {
+      if (el.closest(".hero")) return;
+      el.style.setProperty("--i", String([...el.parentElement.children].indexOf(el) % 4));
+      el.classList.add("will-reveal");
+      io.observe(el);
+    });
+  }
+
+  addEventListener("hashchange", () => { const k = fromHash(); if (k && k !== state.key) apply(k, { keepScroll: false }); });
+  app.dataset.key = "ru";
+  apply(state.key, { keepScroll: false });
+})();
+
+</script>
+</body>
+</html>
