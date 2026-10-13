@@ -28,7 +28,7 @@
 | taste-skill | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | `SKILL.md`, `tells`, `copy`, `type`, `colour`, `layout`, `motion` |
 | motion-design | [LottieFiles/motion-design-skill](https://github.com/LottieFiles/motion-design-skill) | `SKILL.md`, `timing-easing-tables`, `quality-checklist`, `entrance-exit`, `ambient-continuous` |
 
-Брались только тексты: скрипты (`draw.mjs`, `inspect.mjs`, `impeccable context`) в чате не запустить, промпт прямо говорит модели пропускать такие шаги. Порядок файлов в бандле — `SKILL_FILES` в `scripts/build.ts`.
+Брались только тексты: скрипты (`draw.mjs`, `inspect.mjs`, `impeccable context`) в чате не запустить, промпт прямо говорит модели пропускать такие шаги. Какие файлы входят в каждое вложение — `SKILLS` в `scripts/build.ts`.
 
 ## Как прогонять в чате
 
