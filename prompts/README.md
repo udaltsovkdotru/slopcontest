@@ -42,7 +42,7 @@
 | Gemini Argon 4 | `slops/gemini-argon-4/` |
 | Claude Haiku 5.5 | `slops/claude-haiku-5.5/` |
 | Claude Sonnet 5.5 | `slops/claude-sonnet-5.5/` |
-| Claude Opus 5.5 | `slops/claude-opus-5.5/` (только со скиллами) |
+| Claude Opus 5.5 | `slops/claude-opus-5.5/` |
 | MiMo V2.6 Pro | `slops/mimo-v2.6-pro/` |
 
 После того как положил HTML — `bun run shots`, чтобы снять превью для витрины.
