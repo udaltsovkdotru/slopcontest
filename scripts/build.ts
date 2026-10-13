@@ -149,7 +149,7 @@ const compare = first
   : `<p class="compare-empty">Как только у какой-нибудь модели сварятся два варианта, здесь можно будет двигать границу между ними.</p>`;
 
 // --- Рецепт: семейство моделей × вариант → промпт и вложение.
-const FAMILY_LABEL: Record<string, string> = { gemini: "Gemini", claude: "Claude", mimo: "MiMo", other: "Другие модели" };
+const FAMILY_LABEL: Record<string, string> = { gemini: "Gemini", claude: "Claude", mimo: "MiMo", qwen: "Qwen", other: "Другие модели" };
 const kit = `<div class="kit-families" role="group" aria-label="Для какой модели промпт">
           ${FAMILIES.map((f, i) => `<button type="button" class="chip chip-s" data-family="${f}" aria-pressed="${i === 0}">${esc(FAMILY_LABEL[f] ?? f)}</button>`).join("\n          ")}
         </div>

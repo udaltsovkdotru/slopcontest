@@ -118,6 +118,24 @@
       "color": "#4E6E24",
       "ink": "#F7FFE8",
       "family": "mimo"
+    },
+    {
+      "id": "qwen-3.8-max",
+      "name": "Qwen 3.8 Max",
+      "vendor": "Alibaba",
+      "flavor": "Арбуз",
+      "color": "#FF5A5F",
+      "ink": "#2A0006",
+      "family": "qwen"
+    },
+    {
+      "id": "qwen-3.8-omni-flash",
+      "name": "Qwen 3.8 Omni Flash",
+      "vendor": "Alibaba",
+      "flavor": "Карамель",
+      "color": "#C9893B",
+      "ink": "#1E1004",
+      "family": "qwen"
     }
   ]
 }

@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Ядро | [`core.md`](core.md) | Мета-промпт в XML-блоках: роль, цель, формат ответа, требования, четыре версии сайта, бренд, весь контент, процесс, самопроверка, повтор задачи в конце. Одно на всех — поэтому сравнение честное. |
 | Скиллы | `<attached_skills>` (генерируется) | Для вариантов со скиллами: какой файл приложен и как применять его в чате. |
-| Приложение модели | [`appendix/`](appendix) | Короткие заметки под семейство: Gemini, Claude, MiMo, другие. Только про то, как читать задание и отвечать, без дизайн-советов. |
+| Приложение модели | [`appendix/`](appendix) | Короткие заметки под семейство: Gemini, Claude, MiMo, Qwen, другие. Только про то, как читать задание и отвечать, без дизайн-советов. |
 
 Варианты (по 6 на модель): без скиллов, frontend-design, motion-design, impeccable, taste-skill v2, все скиллы.
 
@@ -16,6 +16,7 @@
 
 - Gemini: [Google, prompting strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies) — прямые инструкции, единая разметка, инструкции после длинного контекста, явный запрос полноты (по умолчанию модель краткая), текущий год в поисковых запросах.
 - Claude: [Anthropic, prompting for frontend aesthetics](https://platform.claude.com/cookbook/coding-prompting-for-frontend-aesthetics) и [Improving frontend design through Skills](https://claude.com/blog/improving-frontend-design-through-skills) — XML-теги, явность, «не сдерживайся», дизайн-знания вынесены в скиллы, а не в системный промпт.
+- Qwen: официального гайда по Qwen3-Max не нашлось; по карточкам открытых Qwen3 — режим размышлений по умолчанию и риск бесконечных повторов, поэтому просим не дублировать блоки.
 - MiMo: официального гайда по промптингу не нашлось — общие правила для длинного контекста и агентных моделей.
 
 ## Что входит во вложения
@@ -48,6 +49,8 @@
 | Claude Sonnet 5.5 | `slops/claude-sonnet-5.5/` |
 | Claude Opus 5.5 | `slops/claude-opus-5.5/` |
 | MiMo V2.6 Pro | `slops/mimo-v2.6-pro/` |
+| Qwen 3.8 Max | `slops/qwen-3.8-max/` |
+| Qwen 3.8 Omni Flash | `slops/qwen-3.8-omni-flash/` |
 
 После того как положил HTML — `bun run shots`, чтобы снять превью для витрины.
 
