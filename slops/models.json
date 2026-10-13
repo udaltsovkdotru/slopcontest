@@ -1,0 +1,48 @@
+{
+  "variants": [
+    {
+      "id": "raw",
+      "label": "Без скиллов",
+      "prompt": "prompts/raw.md"
+    },
+    {
+      "id": "skills",
+      "label": "Со скиллами",
+      "prompt": "prompts/skills.md"
+    }
+  ],
+  "models": [
+    {
+      "id": "gemini-3.5-flash-lite",
+      "name": "Gemini Flash Lite 3.5",
+      "vendor": "Google",
+      "flavor": "Лайм",
+      "color": "#B8F04A",
+      "ink": "#10240A"
+    },
+    {
+      "id": "gemini-3.8-flash",
+      "name": "Gemini Flash 3.8",
+      "vendor": "Google",
+      "flavor": "Манго",
+      "color": "#FFA62B",
+      "ink": "#2A1500"
+    },
+    {
+      "id": "gemini-3.1-pro",
+      "name": "Gemini Pro 3.1",
+      "vendor": "Google",
+      "flavor": "Вишня",
+      "color": "#A3154A",
+      "ink": "#FFF4F7"
+    },
+    {
+      "id": "gemini-argon-4",
+      "name": "Gemini Argon 4",
+      "vendor": "Google",
+      "flavor": "Аргон",
+      "color": "#8FD3FF",
+      "ink": "#06202E"
+    }
+  ]
+}

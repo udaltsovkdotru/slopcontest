@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>slopcontest</title>
+  <meta name="description" content="ПРОООДОВЦЫ, посмотрим, какая ЛЛМка слопит лучше всех. Нейросети переделывают лендинг олимпиады PROD — слоп на любой вкус и цвет.">
+  <meta name="theme-color" content="#00402E">
+  <meta property="og:title" content="slopcontest — слоп на любой вкус и цвет">
+  <meta property="og:description" content="Нейросети переделывают лендинг олимпиады PROD. Смотрим, какая слопит лучше всех.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700&family=Unbounded:wght@600;800;900&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+  <a class="skip" href="#menu">К меню слопа</a>
+
+  <header class="bar">
+    <a class="wordmark" href="./">slopcontest</a>
+    <nav aria-label="Разделы">
+      <a href="#menu">Меню</a>
+      <a href="#recipe">Рецепт</a>
+      <a href="https://github.com/udaltsovkdotru/slopcontest">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title" class="shout" aria-label="ПРОООДОВЦЫ,"><span aria-hidden="true">ПР<span class="scoop s1">О</span><span class="scoop s2">О</span><span class="scoop s3">О</span><span class="cut">-</span>Д<span class="scoop s4">О</span>ВЦЫ,</span></h1>
+      <div class="hero-copy">
+        <p class="statement">посмотрим, какая ЛЛМка слопит лучше всех.</p>
+        <p class="tagline">Слоп на любой вкус и цвет!</p>
+        <p class="lede">{{MODELS}} модели Gemini переделывают лендинг олимпиады PROD. Каждая — дважды: голым промптом и с дизайн-скиллами. Готово {{READY}} из {{TOTAL}}.</p>
+        <a class="cta" href="#menu">Выбрать слоп</a>
+      </div>
+    </section>
+
+    <section id="menu" class="menu" aria-labelledby="menu-title">
+      <div class="menu-head">
+        <h2 id="menu-title">Меню слопа</h2>
+        <p>Один промпт, один чат, один HTML-файл. Публикуем ровно то, что выдала модель, без правок руками.</p>
+      </div>
+      <ul class="flavors">{{MENU}}
+      </ul>
+    </section>
+
+    <section id="recipe" class="recipe" aria-labelledby="recipe-title">
+      <h2 id="recipe-title">Рецепт</h2>
+      <div class="recipe-body">
+        <div class="recipe-text">
+          <p>Оригинал — лендинг олимпиады PROD, <a href="https://prodcontest.com">prodcontest.com</a>. Каждая модель получает одинаковый бриф со всеми фактами с сайта и возвращает один HTML-файл.</p>
+          <p>Каждая попытка — в новом чате, поиск разрешён. Если код обрывается, пишем «продолжай» и склеиваем куски.</p>
+          <p>Со скиллами — тот же промпт плюс приложенный файл с четырьмя дизайн-скиллами: frontend-design, impeccable, taste-skill и motion-design.</p>
+        </div>
+        <ul class="kit">
+          <li>
+            <span class="kit-name">Промпт без скиллов</span>
+            <span class="kit-actions">
+              <button type="button" class="kit-btn" data-copy="prompts/raw.txt">Копировать</button>
+              <a class="kit-btn" href="prompts/raw.txt" download="prompt-raw.txt">Скачать</a>
+            </span>
+          </li>
+          <li>
+            <span class="kit-name">Промпт со скиллами</span>
+            <span class="kit-actions">
+              <button type="button" class="kit-btn" data-copy="prompts/skills.txt">Копировать</button>
+              <a class="kit-btn" href="prompts/skills.txt" download="prompt-skills.txt">Скачать</a>
+            </span>
+          </li>
+          <li>
+            <span class="kit-name">Файл скиллов для вложения</span>
+            <span class="kit-actions">
+              <a class="kit-btn" href="prompts/slop-skills.md" download="slop-skills.md">Скачать slop-skills.md</a>
+            </span>
+          </li>
+        </ul>
+        <p class="kit-status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="end">
+    <p class="end-mark" aria-hidden="true">slopcontest</p>
+    <p class="end-note">Фан-проект, не сайт олимпиады. Настоящий PROD живёт на <a href="https://prodcontest.com">prodcontest.com</a>.</p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
