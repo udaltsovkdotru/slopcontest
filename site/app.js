@@ -18,6 +18,14 @@ for (const btn of document.querySelectorAll("[data-copy]")) {
   });
 }
 
+// Семейство моделей для промптов: меняет, какой файл копируется.
+for (const fam of document.querySelectorAll("[data-family]")) {
+  fam.addEventListener("click", () => {
+    for (const f of document.querySelectorAll("[data-family]")) f.setAttribute("aria-pressed", String(f === fam));
+    for (const b of document.querySelectorAll("[data-copy][data-variant]")) b.dataset.copy = `prompts/${fam.dataset.family}/${b.dataset.variant}.txt`;
+  });
+}
+
 // Сравнение «без скиллов / со скиллами»: граница двигается ползунком, пальцем или мышью по картинке.
 const compare = document.querySelector("[data-compare]");
 if (compare) {
@@ -40,13 +48,27 @@ if (compare) {
   frame.addEventListener("pointerup", () => (dragging = false));
   frame.style.touchAction = "pan-y";
 
+  const right = compare.querySelector("[data-right-label]");
+  const variantsBox = compare.querySelector("[data-variants]");
+  let pair = pairs[0];
+  const showVariant = (v) => {
+    skills.src = `${v.href}preview.webp`;
+    skills.alt = `${v.label}: ${pair.name}`;
+    right.textContent = v.label;
+    for (const c of variantsBox.children) c.setAttribute("aria-pressed", String(c.dataset.variant === v.id));
+  };
+  const wireVariants = () => {
+    for (const c of variantsBox.children) c.addEventListener("click", () => showVariant(pair.variants.find((v) => v.id === c.dataset.variant)));
+  };
+  wireVariants();
   for (const chip of compare.querySelectorAll("[data-pair]")) {
     chip.addEventListener("click", () => {
-      const p = pairs.find((x) => x.id === chip.dataset.pair);
-      raw.src = `${p.raw}preview.webp`;
-      raw.alt = `Без скиллов: ${p.name}`;
-      skills.src = `${p.skills}preview.webp`;
-      skills.alt = `Со скиллами: ${p.name}`;
+      pair = pairs.find((x) => x.id === chip.dataset.pair);
+      raw.src = `${pair.raw}preview.webp`;
+      raw.alt = `Без скиллов: ${pair.name}`;
+      variantsBox.innerHTML = pair.variants.map((v) => `<button type="button" class="chip chip-s" data-variant="${v.id}" aria-pressed="false">${v.label}</button>`).join("");
+      wireVariants();
+      showVariant(pair.variants.at(-1));
       for (const c of compare.querySelectorAll("[data-pair]")) c.setAttribute("aria-pressed", String(c === chip));
     });
   }

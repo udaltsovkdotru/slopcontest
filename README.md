@@ -2,15 +2,15 @@
 
 ПРОООДОВЦЫ, посмотрим, какая ЛЛМка слопит лучше всех. Слоп на любой вкус и цвет!
 
-Нейросети разных компаний (Google Gemini, Anthropic Claude, Xiaomi MiMo и дальше больше) переделывают лендинг олимпиады PROD ([prodcontest.com](https://prodcontest.com)) — каждая дважды: голым промптом и с дизайн-скиллами. Результат публикуется как есть.
+Нейросети разных компаний (Google Gemini, Anthropic Claude, Xiaomi MiMo, Alibaba Qwen и дальше больше) переделывают лендинг олимпиады PROD ([prodcontest.com](https://prodcontest.com)) — в шести вариантах: голым промптом, с каждым из четырёх дизайн-скиллов и со всеми сразу. Результат публикуется как есть.
 
 ## Структура
 
 ```
-site/              главная (шаблон: {{MENU}} и счётчики подставляет билд)
+site/              главная (шаблон: витрину, сравнение, рецепт и счётчики подставляет билд)
 slops/models.json  модели и варианты
 slops/<model>/<variant>/index.html   слоп модели
-prompts/           промпты и файлы скиллов для вложения → prompts/README.md
+prompts/           мета-промпт, приложения под модели и файлы скиллов → prompts/README.md
 scripts/build.ts   сборка в dist/ (Bun.build, Bun.Glob, Bun.$)
 scripts/shots.ts   превью слопов (Bun.WebView + Bun.Image → webp)
 ```

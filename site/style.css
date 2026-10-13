@@ -226,6 +226,15 @@ a.tile-link:hover .tile-window img, a.tile-link:focus-visible .tile-window img {
 }
 .is-cooking .tile-variant { background: transparent; color: inherit; padding-left: 0; }
 
+/* Очередь: что ещё не сварилось */
+.queue { margin-top: clamp(48px, 6vw, 88px); }
+.queue h3 { font: 700 var(--step-lead)/1.1 var(--display); letter-spacing: -0.03em; margin-bottom: 16px; }
+.queue-list { display: grid; gap: 6px; }
+.queue-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding: 12px 16px; background: var(--field); color: var(--field-ink); }
+.queue-name { font: 700 var(--step-body)/1.1 var(--display); letter-spacing: -0.03em; min-width: 12em; }
+.queue-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.queue-pills li { padding: 6px 12px; border-radius: 999px; border: 2px solid currentColor; font: 600 var(--step-small)/1 var(--text); }
+
 /* Сравнение: одна живая штука страницы */
 .compare-chapter { background: var(--cmp-bg); color: var(--cmp-ink); }
 .compare-pick { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
@@ -237,6 +246,9 @@ a.tile-link:hover .tile-window img, a.tile-link:focus-visible .tile-window img {
 }
 .chip[aria-pressed="true"] { background: var(--field); color: var(--field-ink); }
 .chip:active { transform: scale(0.95); }
+.chip-s { min-height: 40px; font-family: var(--text); }
+.compare-variants { margin-top: -12px; }
+.compare-variants .chip[aria-pressed="true"] { background: var(--yellow); color: var(--ink); }
 .compare-frame {
   --pos: 50%;
   position: relative; display: grid;
@@ -278,7 +290,10 @@ html:not(.js) .compare-frame figcaption { grid-column: 1 / -1; }
 .stages li:nth-child(3) b { background: var(--mango); color: var(--ink); }
 .stages li:nth-child(4) b { background: var(--cream); color: var(--ink); }
 .stages span { max-width: 24ch; }
-.kit { display: grid; gap: 6px; margin-top: clamp(56px, 7vw, 104px); max-width: 980px; }
+.kit-families { display: flex; flex-wrap: wrap; gap: 8px; margin-top: clamp(56px, 7vw, 104px); }
+.kit-families .chip { background: var(--kit-bg); }
+.kit-families .chip[aria-pressed="true"] { background: var(--seg2-bg); color: var(--seg2-ink); }
+.kit { display: grid; gap: 6px; margin-top: 16px; max-width: 980px; }
 .kit li {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px;
   padding: 18px 20px; background: var(--kit-bg); color: var(--cream);

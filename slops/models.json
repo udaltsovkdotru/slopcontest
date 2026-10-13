@@ -2,13 +2,45 @@
   "variants": [
     {
       "id": "raw",
-      "label": "Без скиллов",
-      "prompt": "prompts/raw.md"
+      "label": "Без скиллов"
+    },
+    {
+      "id": "frontend-design",
+      "label": "frontend-design",
+      "skills": [
+        "frontend-design"
+      ]
+    },
+    {
+      "id": "motion-design",
+      "label": "motion-design",
+      "skills": [
+        "motion-design"
+      ]
+    },
+    {
+      "id": "impeccable",
+      "label": "impeccable",
+      "skills": [
+        "impeccable"
+      ]
+    },
+    {
+      "id": "taste",
+      "label": "taste-skill v2",
+      "skills": [
+        "taste"
+      ]
     },
     {
       "id": "skills",
-      "label": "Со скиллами",
-      "prompt": "prompts/skills.md"
+      "label": "Все скиллы",
+      "skills": [
+        "frontend-design",
+        "impeccable",
+        "taste",
+        "motion-design"
+      ]
     }
   ],
   "models": [
@@ -18,7 +50,8 @@
       "vendor": "Google",
       "flavor": "Лайм",
       "color": "#B8F04A",
-      "ink": "#10240A"
+      "ink": "#10240A",
+      "family": "gemini"
     },
     {
       "id": "gemini-3.8-flash",
@@ -26,7 +59,8 @@
       "vendor": "Google",
       "flavor": "Манго",
       "color": "#FFA62B",
-      "ink": "#2A1500"
+      "ink": "#2A1500",
+      "family": "gemini"
     },
     {
       "id": "gemini-3.1-pro",
@@ -34,7 +68,8 @@
       "vendor": "Google",
       "flavor": "Вишня",
       "color": "#A3154A",
-      "ink": "#FFF4F7"
+      "ink": "#FFF4F7",
+      "family": "gemini"
     },
     {
       "id": "gemini-argon-4",
@@ -42,7 +77,8 @@
       "vendor": "Google",
       "flavor": "Аргон",
       "color": "#8FD3FF",
-      "ink": "#06202E"
+      "ink": "#06202E",
+      "family": "gemini"
     },
     {
       "id": "claude-haiku-5.5",
@@ -51,7 +87,8 @@
       "flavor": "Клубника",
       "color": "#FF7A9C",
       "ink": "#2A0010",
-      "note": "Агент в чате, без браузера и скриншотов"
+      "note": "Агент в чате, без браузера и скриншотов",
+      "family": "claude"
     },
     {
       "id": "claude-sonnet-5.5",
@@ -60,7 +97,8 @@
       "flavor": "Мята",
       "color": "#5EE3B5",
       "ink": "#00271A",
-      "note": "Агент в чате, без браузера и скриншотов"
+      "note": "Агент в чате, без браузера и скриншотов",
+      "family": "claude"
     },
     {
       "id": "claude-opus-5.5",
@@ -69,10 +107,8 @@
       "flavor": "Шоколад",
       "color": "#5A3220",
       "ink": "#FFE9CC",
-      "variants": [
-        "skills"
-      ],
-      "note": "Агент со скиллами и проверкой в браузере"
+      "note": "Без скиллов — агент как в чате; со скиллами — агент с браузером и проверками",
+      "family": "claude"
     },
     {
       "id": "mimo-v2.6-pro",
@@ -80,7 +116,26 @@
       "vendor": "Xiaomi",
       "flavor": "Матча",
       "color": "#4E6E24",
-      "ink": "#F7FFE8"
+      "ink": "#F7FFE8",
+      "family": "mimo"
+    },
+    {
+      "id": "qwen-3.8-max",
+      "name": "Qwen 3.8 Max",
+      "vendor": "Alibaba",
+      "flavor": "Арбуз",
+      "color": "#FF5A5F",
+      "ink": "#2A0006",
+      "family": "qwen"
+    },
+    {
+      "id": "qwen-3.8-omni-flash",
+      "name": "Qwen 3.8 Omni Flash",
+      "vendor": "Alibaba",
+      "flavor": "Карамель",
+      "color": "#C9893B",
+      "ink": "#1E1004",
+      "family": "qwen"
     }
   ]
 }
